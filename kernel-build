@@ -146,7 +146,7 @@ if test -z "$BOARD"; then
 		BOARD="${CONFIG%_defconfig}"
 
 		if test "x$verbose" = "xno"; then
-			echo -en "building \033[33;1m${ARCH}/${BOARD}\033[0m using $CONFIG ($JOBS jobs)..."
+			echo -en "building \033[35m${ARCH}\033[0m/\033[33m${BOARD}\033[0m using $CONFIG ($JOBS jobs)..."
 		fi
 
 		build_board $ARCH $BOARD $CROSS_COMPILE
@@ -162,7 +162,7 @@ if test -z "$BOARD"; then
 	done
 else
 	if test "x$verbose" = "xno"; then
-		echo -en "building \033[33;1m${ARCH}/${BOARD}\033[0m using ${BOARD}_defconfig ($JOBS jobs)..."
+		echo -en "building \033[35m${ARCH}\033[0m/\033[33m${BOARD}\033[0m using ${BOARD}_defconfig ($JOBS jobs)..."
 	fi
 
 	build_board $ARCH $BOARD $CROSS_COMPILE
