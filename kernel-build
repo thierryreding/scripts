@@ -1,0 +1,178 @@
+#!/bin/sh
+
+PATH=~/pbs-stage1/bin:$PATH
+export PATH
+
+verbose=no
+strict=no
+clean=no
+
+usage() {
+	echo "usage: $1 [options]"
+}
+
+while test $# -ne 0; do
+	if test -n "$prev"; then
+		eval "$prev=$1"
+		shift; prev=
+		continue
+	fi
+
+	case $1 in
+		--arch | -a)
+			prev=ARCH
+			shift
+			;;
+
+		--board | -b)
+			prev=BOARD
+			shift
+			;;
+
+		--clean | -c)
+			clean=yes
+			shift
+			;;
+
+		--strict | -S)
+			strict=yes
+			shift
+			;;
+
+		--verbose | -v)
+			verbose=yes
+			shift
+			;;
+
+		*)
+			usage $0
+			exit 1
+			;;
+	esac
+done
+
+if test -z "$ARCH"; then
+	echo "ERROR: architecture not specified"
+	exit 1;
+fi
+
+if test -z "$CROSS_COMPILE"; then
+	for target in $ARCH-linux-gnu $ARCH-unknown-linux-gnu; do
+		if type -p $target-gcc > /dev/null 2>&1; then
+			CROSS_COMPILE=$(type -p $target-gcc)
+			CROSS_COMPILE=${CROSS_COMPILE%gcc}
+			break
+		fi
+	done
+
+	if test -z "$CROSS_COMPILE"; then
+		echo "ERROR: Cross-compilation toolchain not found! Please set"
+		echo "       the CROSS_COMPILE environment variable."
+		exit 1
+	else
+		echo "Cross-compiler detected: $CROSS_COMPILE"
+	fi
+fi
+
+if test "$CROSS_COMPILE" = "native"; then
+	CROSS_COMPILE=
+fi
+
+if test -z "$JOBS"; then
+	JOBS=$(lscpu | awk '/^CPU\(s\):/ { print $2 }')
+fi
+
+build_board() {
+	local ARCH="$1"
+	local BOARD="$2"
+	local CROSS_COMPILE="$3"
+	local CONFIG=${BOARD}_defconfig
+	local ARGS=
+
+	ARGS="$ARGS ARCH=$ARCH"
+	ARGS="$ARGS CROSS_COMPILE=$CROSS_COMPILE"
+	ARGS="$ARGS O=build/${ARCH}/${BOARD}"
+
+	if test "x$strict" = "xyes"; then
+		ARGS="$ARGS KCFLAGS=-Werror"
+	fi
+
+	if test "x$clean" = "xyes"; then
+		rm -rf "build/${ARCH}/${BOARD}"
+	fi
+
+	if ! test -d "build/${ARCH}/${BOARD}"; then
+		mkdir -p "build/${ARCH}/${BOARD}"; ret=$?
+		if test $ret -ne 0; then
+			return $ret
+		fi
+	fi
+
+	if ! test -d "logs/${ARCH}"; then
+		mkdir -p "logs/${ARCH}"; ret=$?
+		if test $ret -ne 0; then
+			return $ret
+		fi
+	fi
+
+	if test "x$verbose" = "xyes"; then
+		make $ARGS "${CONFIG}" 2>&1 | tee "logs/${ARCH}/${BOARD}.log"; ret=$?
+		if test $ret -ne 0; then
+			return $ret
+		fi
+
+		make $ARGS -j $JOBS 2>&1 | tee -a "logs/${ARCH}/${BOARD}.log"; ret=$?
+		if test $ret -ne 0; then
+			return $ret
+		fi
+	else
+		make $ARGS "${CONFIG}" > "logs/${ARCH}/${BOARD}.log" 2>&1; ret=$?
+		if test $ret -ne 0; then
+			return $ret
+		fi
+
+		make $ARGS -j $JOBS >> "logs/${ARCH}/${BOARD}.log" 2>&1; ret=$?
+		if test $ret -ne 0; then
+			return $ret
+		fi
+	fi
+
+	return 0
+}
+
+if test -z "$BOARD"; then
+	for defconfig in "arch/${ARCH}/configs/"*_defconfig; do
+		CONFIG="${defconfig##*/}"
+		BOARD="${CONFIG%_defconfig}"
+
+		if test "x$verbose" = "xno"; then
+			echo -en "building \033[33;1m${ARCH}/${BOARD}\033[0m using $CONFIG ($JOBS jobs)..."
+		fi
+
+		build_board $ARCH $BOARD $CROSS_COMPILE
+		ret=$?
+
+		if test "x$verbose" = "xno"; then
+			if test $ret -ne 0; then
+				echo "failed ($ret)"
+			else
+				echo "done"
+			fi
+		fi
+	done
+else
+	if test "x$verbose" = "xno"; then
+		echo -en "building \033[33;1m${ARCH}/${BOARD}\033[0m using ${BOARD}_defconfig ($JOBS jobs)..."
+	fi
+
+	build_board $ARCH $BOARD $CROSS_COMPILE
+	ret=$?
+
+	if test "x$verbose" = "xno"; then
+		if test $ret -ne 0; then
+			echo -e "\033[31;1mfailed ($ret)\033[0m"
+		else
+			echo -e "\033[32;1mdone\033[0m"
+		fi
+	fi
+fi

@@ -1,0 +1,82 @@
+#!/bin/sh
+
+ARCH=
+SOC=
+BOARDS=
+
+while test $# -gt 0; do
+	if test -n "$prev"; then
+		eval "$prev=$1"; prev=
+		shift; continue
+	fi
+
+	case $1 in
+		--arch)
+			prev=ARCH
+			shift
+			;;
+
+		--soc)
+			prev=SOC
+			shift
+			;;
+
+		*)
+			BOARDS="$BOARDS $1"
+			shift
+			;;
+	esac
+done
+
+if test -n "$ARCH"; then
+	FILTER="(\$2 == \"$ARCH\")"
+fi
+
+if test -n "$SOC"; then
+	if test -n "$FILTER"; then
+		FILTER="$FILTER && "
+	fi
+
+	FILTER="$FILTER(\$4 == \"$SOC\" || \$4 ~ /$SOC/)"
+fi
+
+if test -n "$BOARDS"; then
+	BOARD_FILTER=
+
+	for board in $BOARDS; do
+		if test -n "$BOARD_FILTER"; then
+			BOARD_FILTER="$BOARD_FILTER || "
+		fi
+
+		BOARD_FILTER="$BOARD_FILTER(\$7 == \"$board\")"
+	done
+
+	if test -n "$FILTER"; then
+		FILTER="$FILTER && "
+	fi
+
+	FILTER="$FILTER($BOARD_FILTER)"
+fi
+
+if test -n "$FILTER"; then
+	FILTER="($FILTER)"
+fi
+
+awk "/^#/ || /^$/ { next }; $FILTER { print \$4\" \"\$5\" \"\$7 }" boards.cfg |
+	while read soc vendor board; do
+		builddir="build/${soc}/${board}"
+
+		if ! test -d "$builddir"; then
+			mkdir -p "$builddir"
+		fi
+
+		echo -n "building ${soc}/${board}..."
+
+		make CROSS_COMPILE=${CROSS_COMPILE} O="$builddir" "$board" -j12 > "$builddir/build.log" 2>&1
+
+		if test "x$?" != "x0"; then
+			echo "failed"
+		else
+			echo "done"
+		fi
+	done
