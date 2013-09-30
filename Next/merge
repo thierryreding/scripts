@@ -40,7 +40,7 @@ tail -n +5 < Next/Trees | while read tree type url; do
 	echo -en "from ${COLOR_REPOSITORY}${repository}${COLOR_DEFAULT} "
 	echo -e  "branch ${COLOR_BRANCH}$branch${COLOR_DEFAULT}"
 
-	if ! git pull $repository $branch; then
+	if ! git merge ${tree}/${branch}; then
 		/bin/sh <&- < /dev/tty
 	fi
 done
