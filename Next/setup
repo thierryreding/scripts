@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 tail -n +5 < Next/Trees | while read tree type url; do
 	repository=${url%#*}
