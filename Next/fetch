@@ -9,6 +9,8 @@ tail -n +5 < Next/Trees | while read tree type url; do
 		continue
 	fi
 
+	git remote set-url ${tree} ${repository}
+
 	echo "Fetching tree $tree ($repository)..."
 	git fetch $tree
 done
