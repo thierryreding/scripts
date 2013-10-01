@@ -5,7 +5,8 @@ all:
 
 install-targets = \
 	$(bindir)/kernel-build \
-	$(bindir)/uboot-build
+	$(bindir)/uboot-build \
+	$(bindir)/rr-cache
 
 $(bindir):
 	mkdir -p $@
