@@ -41,6 +41,6 @@ tail -n +5 < Next/Trees | while read tree type url; do
 	echo -e  "branch ${COLOR_BRANCH}$branch${COLOR_DEFAULT}"
 
 	if ! git merge ${tree}/${branch}; then
-		/bin/sh <&- < /dev/tty
+		/bin/bash <&- < /dev/tty
 	fi
 done
