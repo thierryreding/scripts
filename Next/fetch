@@ -1,5 +1,9 @@
 #!/bin/bash
 
+exec 3> Next/SHA1s
+echo "Name                    SHA1" >&3
+echo "----                    ----" >&3
+
 tail -n +5 < Next/Trees | while read tree type url; do
 	repository=${url%#*}
 	branch=${url#*#}
@@ -13,4 +17,9 @@ tail -n +5 < Next/Trees | while read tree type url; do
 
 	echo "Fetching tree $tree ($repository)..."
 	git fetch $tree
+
+	hash=$(git show-ref --hash -- remotes/$tree/$branch)
+	printf "%-23s %s\n" $tree $hash >&3
 done
+
+exec 3>&-
