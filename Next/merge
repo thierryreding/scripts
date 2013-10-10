@@ -44,3 +44,5 @@ tail -n +5 < Next/Trees | while read tree type url; do
 		/bin/bash <&- < /dev/tty
 	fi
 done
+
+echo "-next-$(date +%Y%m%d)" > localversion-next
