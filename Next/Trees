@@ -182,7 +182,6 @@ char-misc	git	git://git.kernel.org/pub/scm/linux/kernel/git/gregkh/char-misc.git
 scsi		git	git://git.kernel.org/pub/scm/linux/kernel/git/jejb/scsi.git#for-next
 target-updates	git	git://git.kernel.org/pub/scm/linux/kernel/git/nab/target-pending.git#for-next
 target-merge	git	git://git.kernel.org/pub/scm/linux/kernel/git/nab/target-pending.git#for-next-merge
-bcon		git	git://git.kernel.org/pub/scm/linux/kernel/git/joern/bcon2.git#master
 writeback	git	git://git.kernel.org/pub/scm/linux/kernel/git/wfg/linux.git#writeback-for-next
 hwspinlock	git	git://github.com/ohadbc/hwspinlock-next.git#linux-next
 pinctrl		git	git://git.kernel.org/pub/scm/linux/kernel/git/linusw/linux-pinctrl.git#for-next
