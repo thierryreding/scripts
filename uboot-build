@@ -21,12 +21,21 @@ while test $# -gt 0; do
 			shift
 			;;
 
+		--jobs)
+			prev=JOBS
+			shift
+			;;
+
 		*)
 			BOARDS="$BOARDS $1"
 			shift
 			;;
 	esac
 done
+
+if test -z "$JOBS"; then
+	JOBS=1
+fi
 
 if test -n "$ARCH"; then
 	FILTER="(\$2 == \"$ARCH\")"
@@ -72,7 +81,8 @@ awk "/^#/ || /^$/ { next }; $FILTER { print \$4\" \"\$5\" \"\$7 }" boards.cfg |
 
 		echo -n "building ${soc}/${board}..."
 
-		make CROSS_COMPILE=${CROSS_COMPILE} O="$builddir" "$board" -j12 > "$builddir/build.log" 2>&1
+		make CROSS_COMPILE=${CROSS_COMPILE} O="$builddir" "${board}_config" -j$JOBS > "$builddir/build.log" 2>&1
+		make CROSS_COMPILE=${CROSS_COMPILE} O="$builddir" -j$JOBS >> "$builddir/build.log" 2>&1
 
 		if test "x$?" != "x0"; then
 			echo "failed"
