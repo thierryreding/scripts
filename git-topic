@@ -1,0 +1,125 @@
+#!/bin/sh
+
+prefix=staging/
+
+rebase()
+{
+	shift;
+	new=$1
+	old=$2
+
+	if test -z "$old"; then
+		if test -f .git/refs/heads/${prefix}base; then
+			old=${prefix}base
+		else
+			return 1
+		fi
+	fi
+
+	oldref=$(git rev-parse --symbolic-full-name $old)
+	oldhash=$(git rev-parse $oldref)
+
+	newref=$(git rev-parse --symbolic-full-name $new)
+	newhash=$(git rev-parse $newref)
+
+	if ! git diff --quiet || ! git diff --cached --quiet; then
+		dirty=yes
+	else
+		dirty=no
+	fi
+
+	if test "x$dirty" = "xyes"; then
+		git stash
+	fi
+
+	if test "x$newhash" != "x$oldhash"; then
+		while read branch; do
+			if test "x${branch###}" != "x${branch}"; then
+				continue
+			fi
+
+			echo "rebasing $branch onto $newref (old: $oldref)"
+
+			git checkout $branch
+
+			if ! git rebase --onto $newref $oldref; then
+				$SHELL <&- < /dev/tty
+			fi
+		done < .git/topic-branches
+
+		git branch -d $oldref
+		git branch ${prefix}base $newref
+	else
+		echo "$oldref and $newref are the same, rebasing skipped"
+	fi
+
+	git checkout ${prefix}master
+	git branch ${prefix}master-old
+	git reset --hard $newref
+
+	while read branch; do
+		if test "x${branch###}" != "x${branch}"; then
+			continue
+		fi
+
+		echo "merging $branch into ${prefix}master"
+
+		if ! git merge --no-ff $branch; then
+			$SHELL <&- < /dev/tty
+		fi
+	done < .git/topic-branches
+
+	if git checkout --quiet ${prefix}work 2> /dev/null; then
+		if ! git rebase --onto ${prefix}master ${prefix}master-old; then
+			$SHELL <&- < /dev/tty
+		fi
+	else
+		# create an empty work branch
+		git checkout -b ${prefix}work ${prefix}master
+	fi
+
+	git branch -D ${prefix}master-old
+
+	if test "x$dirty" = "xyes"; then
+		git stash pop
+	fi
+}
+
+usage()
+{
+	echo "usage: git topic [command]"
+}
+
+if ! test -f .git/topic-branches; then
+	echo ".git/topic-branches does not exist"
+	exit 1
+fi
+
+errors=no
+
+while read branch; do
+	case $branch in
+		${prefix}base | ${prefix}master | ${prefix}work)
+			echo "ERROR: branch ${branch} is special and can't be used in .git/topic-branches"
+			errors=yes
+			;;
+
+		*)
+			;;
+	esac
+done < .git/topic-branches
+
+if test "x$errors" = "xyes"; then
+	echo "ERROR: sanity checks failed for .git/topic-branches, aborting..."
+	exit 1
+fi
+
+case $1 in
+	rebase)
+		rebase "$@"
+		;;
+
+	*)
+		usage $0
+		;;
+esac
