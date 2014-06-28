@@ -79,14 +79,14 @@ awk "/^#/ || /^$/ { next }; $FILTER { print \$4\" \"\$5\" \"\$7 }" boards.cfg |
 			mkdir -p "$builddir"
 		fi
 
-		echo -n "building ${soc}/${board}..."
+		echo -en "building \033[35m${soc}\033[0m/\033[33m${board}\033[0m..."
 
 		make CROSS_COMPILE=${CROSS_COMPILE} O="$builddir" "${board}_config" -j$JOBS > "$builddir/build.log" 2>&1
 		make CROSS_COMPILE=${CROSS_COMPILE} O="$builddir" -j$JOBS >> "$builddir/build.log" 2>&1
 
 		if test "x$?" != "x0"; then
-			echo "failed"
+			echo -e "\033[1;31mfailed ($ret)\033[0m"
 		else
-			echo "done"
+			echo -e "\033[1;32mdone\033[0m"
 		fi
 	done
