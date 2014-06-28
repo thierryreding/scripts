@@ -34,6 +34,11 @@ while test $# -ne 0; do
 			shift
 			;;
 
+		--jobs | -j)
+			prev=JOBS
+			shift
+			;;
+
 		--strict | -S)
 			strict=yes
 			shift
