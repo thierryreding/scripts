@@ -159,9 +159,9 @@ if test -z "$BOARD"; then
 
 		if test "x$verbose" = "xno"; then
 			if test $ret -ne 0; then
-				echo "failed ($ret)"
+				echo -e "\033[31;1mfailed ($ret)\033[0m"
 			else
-				echo "done"
+				echo -e "\033[32;1mdone\033[0m"
 			fi
 		fi
 	done
