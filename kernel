@@ -1,0 +1,154 @@
+#!/bin/sh
+
+JOBS=$(lscpu | awk '/^CPU\(s\):/ { print $2 }')
+KBUILD_OUTPUT=build
+pwd=`pwd`
+
+while test $# -gt 0; do
+	if test -n "$prev"; then
+		eval "$prev=$1"
+		shift; prev=
+		continue
+	fi
+
+	case $1 in
+		-a | --arch | --architecture)
+			prev=ARCH
+			shift
+			;;
+
+		-o | --output)
+			prev=KBUILD_OUTPUT
+			shift
+			;;
+
+		-j | --jobs)
+			prev=JOBS
+			shift
+			;;
+
+		*)
+			subcommand=$1
+			shift
+			break
+			;;
+	esac
+done
+
+if test -z "$ARCH"; then
+	ARCH=arm
+fi
+
+if test -z "$CROSS_COMPILE"; then
+	case $ARCH in
+		arm)
+			CROSS_COMPILE=armv7l-unknown-linux-gnueabihf-
+			;;
+
+		arm64)
+			CROSS_COMPILE=aarch64-unknown-linux-gnu-
+			;;
+
+		s390)
+			CROSS_COMPILE=s390-ibm-linux-gnu-
+			;;
+
+		score)
+			CROSS_COMPILE=score-unknown-elf-
+			;;
+
+		xtensa)
+			CROSS_COMPILE=xtensa-unknown-linux-uclibc-
+			;;
+
+		x86)
+			# build natively
+			CROSS_COMPILE=
+			;;
+
+		*)
+			CROSS_COMPILE=$ARCH-unknown-linux-gnu-
+			;;
+	esac
+fi
+
+export KBUILD_OUTPUT
+export CROSS_COMPILE
+export ARCH
+
+function configure()
+{
+	DEFCONFIG="${1-defconfig}"
+
+	if test -f "$pwd/environment"; then
+		. "$pwd/environment"
+	fi
+
+	nice make -j $JOBS $DEFCONFIG
+}
+
+function build()
+{
+	check=no
+
+	while test $# -gt 0; do
+		case $1 in
+			-c | --check)
+				check=yes
+				shift
+				;;
+
+			*)
+				break
+				;;
+		esac
+	done
+
+	if test -f "$pwd/environment"; then
+		. "$pwd/environment"
+	fi
+
+	if test "x$check" = "xyes"; then
+		ARGS="C=1"
+	fi
+
+	nice make -j $JOBS $ARGS
+}
+
+function clean()
+{
+	if test -f "$pwd/environment"; then
+		. "$pwd/environment"
+	fi
+
+	nice make -j $JOBS clean
+}
+
+function install()
+{
+	DEVICE="${1-/dev/disk/by-label/boot}"
+	MOUNTPOINT="${2-/mnt}"
+
+	if test -f "$pwd/environment"; then
+		. "$pwd/environment"
+	fi
+
+	if mount "$DEVICE" "$MOUNTPOINT"; then
+		cp "$KBUILD_OUTPUT/arch/$ARCH/boot/zImage" /mnt/boot/zImage
+		cp "$KBUILD_OUTPUT/arch/$ARCH/boot/dts/tegra20-harmony.dtb" /mnt/boot
+		cp "$KBUILD_OUTPUT/arch/$ARCH/boot/dts/tegra20-plutux.dtb" /mnt/boot
+		cp "$KBUILD_OUTPUT/arch/$ARCH/boot/dts/tegra20-trimslice.dtb" /mnt/boot
+		cp "$KBUILD_OUTPUT/arch/$ARCH/boot/dts/tegra30-beaver.dtb" /mnt/boot
+		cp "$KBUILD_OUTPUT/arch/$ARCH/boot/dts/tegra30-cardhu-a04.dtb" /mnt/boot/tegra30-cardhu.dtb
+		cp "$KBUILD_OUTPUT/arch/$ARCH/boot/dts/tegra114-dalmore.dtb" /mnt/boot
+		cp "$KBUILD_OUTPUT/arch/$ARCH/boot/dts/tegra124-jetson-tk1.dtb" /mnt/boot
+		cp "$KBUILD_OUTPUT/arch/$ARCH/boot/dts/tegra124-venice2.dtb" /mnt/boot
+		umount "$MOUNTPOINT"
+	fi
+}
+
+if test "$(type -t $subcommand 2> /dev/null)" = 'function'; then
+	$subcommand "$@"
+else
+	echo "$subcommand: no such command"
+fi
