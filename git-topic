@@ -4,23 +4,48 @@ prefix=staging/
 
 rebase()
 {
+	dry_run=no
 	shift;
-	new=$1
-	old=$2
+
+	while test "$#" -gt 0; do
+		case $1 in
+			-n | --dry-run)
+				dry_run=yes
+				shift
+				;;
+
+			*)
+				new=$1
+				old=$2
+				break
+				;;
+		esac
+	done
 
 	if test -z "$old"; then
-		if test -f .git/refs/heads/${prefix}base; then
-			old=${prefix}base
-		else
-			return 1
-		fi
+		old=${prefix}base
+	fi
+
+	if ! git rev-parse --verify --quiet $old > /dev/null 2>&1; then
+		echo "ERROR: old base ($old) not found"
+		return 1
+	fi
+
+	if ! git rev-parse --verify --quiet $new > /dev/null 2>&1; then
+		echo "ERROR: new base ($new) not found"
+		return 1
 	fi
 
 	oldref=$(git rev-parse --symbolic-full-name $old)
 	oldhash=$(git rev-parse $oldref)
 
 	newref=$(git rev-parse --symbolic-full-name $new)
-	newhash=$(git rev-parse $newref)
+
+	if git show-ref --dereference $new > /dev/null 2>&1; then
+		newhash=$(git rev-parse $newref^{commit})
+	else
+		newhash=$(git rev-parse $newref)
+	fi
 
 	if ! git diff --quiet || ! git diff --cached --quiet; then
 		dirty=yes
@@ -29,7 +54,11 @@ rebase()
 	fi
 
 	if test "x$dirty" = "xyes"; then
-		git stash
+		if test "x$dry_run" = "xyes"; then
+			echo "running: git stash"
+		else
+			git stash
+		fi
 	fi
 
 	if test "x$newhash" != "x$oldhash"; then
@@ -40,49 +69,137 @@ rebase()
 
 			echo "rebasing $branch onto $newref (old: $oldref)"
 
-			git checkout $branch
+			if test "x$dry_run" = "xyes"; then
+				echo "running: git checkout $branch"
+			else
+				git checkout $branch
+			fi
 
-			if ! git rebase --onto $newref $oldref; then
-				$SHELL <&- < /dev/tty
+			if test "x$dry_run" = "xyes"; then
+				echo "running: git rebase --onto $newref $oldref"
+			else
+				if ! git rebase --onto $newref $oldref; then
+					$SHELL <&- < /dev/tty
+				fi
 			fi
 		done < .git/topic-branches
 
-		git branch -d $oldref
-		git branch ${prefix}base $newref
+		if test "x$dry_run" = "xyes"; then
+			echo "running: git branch -D ${prefix}base"
+			echo "running: git branch ${prefix}base $newref"
+		else
+			git branch -D ${prefix}base
+			git branch ${prefix}base $newref
+		fi
 	else
 		echo "$oldref and $newref are the same, rebasing skipped"
 	fi
 
-	git checkout ${prefix}master
-	git branch ${prefix}master-old
-	git reset --hard $newref
+	if test "x$dry_run" = "xyes"; then
+		echo "running: git checkout ${prefix}master"
+		echo "running: git branch ${prefix}master-old"
+		echo "running: git reset --hard $newref"
+	else
+		git checkout ${prefix}master
+		git branch ${prefix}master-old
+		git reset --hard $newref
+	fi
 
 	while read branch; do
 		if test "x${branch###}" != "x${branch}"; then
 			continue
 		fi
 
-		echo "merging $branch into ${prefix}master"
+		if test "x$dry_run" = "xyes"; then
+			echo "running: git merge --no-ff $branch"
+		else
+			echo "merging $branch into ${prefix}master"
 
-		if ! git merge --no-ff $branch; then
-			$SHELL <&- < /dev/tty
+			if ! git merge --no-ff $branch; then
+				$SHELL <&- < /dev/tty
+			fi
 		fi
 	done < .git/topic-branches
 
-	if git checkout --quiet ${prefix}work 2> /dev/null; then
-		if ! git rebase --onto ${prefix}master ${prefix}master-old; then
-			$SHELL <&- < /dev/tty
-		fi
+	if test "x$dry_run" = "xyes"; then
+		echo "running: git checkout --quiet ${prefix}work"
+		echo "running: git rebase --onto ${prefix}master ${prefix}master-old"
 	else
-		# create an empty work branch
-		git checkout -b ${prefix}work ${prefix}master
+		if git checkout --quiet ${prefix}work 2> /dev/null; then
+			if ! git rebase --onto ${prefix}master ${prefix}master-old; then
+				$SHELL <&- < /dev/tty
+			fi
+		else
+			# create an empty work branch
+			git checkout -b ${prefix}work ${prefix}master
+		fi
 	fi
 
-	git branch -D ${prefix}master-old
+	if test "x$dry_run" = "xyes"; then
+		echo "running: git branch -D ${prefix}master-old"
+	else
+		git branch -D ${prefix}master-old
+	fi
 
 	if test "x$dirty" = "xyes"; then
-		git stash pop
+		if test "x$dry_run" = "xyes"; then
+			echo "running: git stash pop"
+		else
+			git stash pop
+		fi
 	fi
+
+	echo "git-topic: rebase: all done"
+}
+
+push()
+{
+	shift
+
+	while test "$#" -gt 0; do
+		case $1 in
+			-n | --dry-run)
+				args="$args --dry-run"
+				shift
+				;;
+
+			-f | --force)
+				args="$args --force"
+				shift
+				;;
+
+			-* | --*)
+				echo "push: unknown option $1"
+				exit 1
+				;;
+
+			*)
+				remote="$1"
+				shift
+				break
+				;;
+		esac
+	done
+
+	if test "x$remote" = "x"; then
+		echo "usage: git topic push [options] REMOTE"
+		exit 1
+	fi
+
+	branches="${prefix}base"
+
+	while read branch; do
+		if test "x${branch###}" != "x${branch}"; then
+			continue
+		fi
+
+		branches="$branches $branch"
+	done < .git/topic-branches
+
+	branches="$branches ${prefix}master ${prefix}work"
+
+	echo "pushing $branches to $remote"
+	git push $args $remote $branches
 }
 
 usage()
@@ -119,7 +236,13 @@ case $1 in
 		rebase "$@"
 		;;
 
+	push)
+		push "$@"
+		;;
+
 	*)
 		usage $0
 		;;
 esac
+
+exit $?
