@@ -1,0 +1,24 @@
+ab8500		arm		u8500_defconfig		PWM=y PWM_SYSFS=y PWM_AB8500=y
+at91		arm		at91_dt_defconfig	PWM=y PWM_SYSFS=y PWM_ATMEL=y PWM_ATMEL_TCLIB=y
+bfin		blackfin	BF561-EZKIT_defconfig	PWM=y PWM_SYSFS=y PWM_BFIN=y
+clps711x	arm		clps711x_defconfig	PWM=y PWM_SYSFS=y PWM_CLPS711X=y
+ep93xx		arm		ep93xx_defconfig	PWM=y PWM_SYSFS=y PWM_EP93XX=y
+imx		arm		imx_v6_v7_defconfig	PWM=y PWM_SYSFS=y PWM_FSL_FTM=y PWM_IMX=y
+jz4740		mips		qi_lb60_defconfig	PWM=y PWM_SYSFS=y PWM_JZ4740=y
+lp3943		arm		allnoconfig		PWM=y PWM_SYSFS=y I2C=y MFD_LP3943=y PWM_LP3943=y
+lpc32xx		arm		lpc32xx_defconfig	PWM=y PWM_SYSFS=y PWM_LPC32XX=y
+lpss		x86		x86_64_defconfig	PWM=y PWM_SYSFS=y PWM_LPSS=y
+mxs		arm		mxs_defconfig		PWM=y PWM_SYSFS=y PWM_MXS=y
+pca9685		arm		allnoconfig		PWM=y PWM_SYSFS=y PWM_PCA9685=y OF=y I2C=y
+puv3		unicore32	unicore32_defconfig	PWM=y PWM_SYSFS=y PWM_PUV3=y
+pxa		arm		pxa3xx_defconfig	PWM=y PWM_SYSFS=y PWM_PXA=y
+pxa-dt		arm		pxa3xx_defconfig	PWM=y PWM_SYSFS=y PWM_PXA=y MACH_PXA3XX_DT=y
+renesas-tpu	arm		allnoconfig		PWM=y PWM_SYSFS=y PWM_RENESAS_TPU=y ARCH_SHMOBILE=y
+samsung		arm		exynos_defconfig	PWM=y PWM_SYSFS=y PWM_SAMSUNG=y
+spear		arm		spear13xx_defconfig	PWM=y PWM_SYSFS=y PWM_SPEAR=y
+tegra		arm		tegra_defconfig		PWM=y PWM_SYSFS=y PWM_TEGRA=y
+ti		arm		omap2plus_defconfig	PWM=y PWM_SYSFS=y PWM_TI_ECAP=y PWM_TI_EHRPWM=y PWM_TWL=y PWM_TWL_LED=y
+vt8500		arm		vt8500_v6_v7_defconfig	PWM=y PWM_SYSFS=y PWM_VT8500=y
+bcm		arm		bcm_defconfig		PWM=y PWM_SYSFS=y PWM_BCM_KONA=y
+rockchip	arm		multi_v7_defconfig	PWM=y PWM_SYSFS=y PWM_ROCKCHIP=y DEBUG_SECTION_MISMATCH=y
+sti		arm		multi_v7_defconfig	PWM=y PWM_SYSFS=y PWM_STI=y
