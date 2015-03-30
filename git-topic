@@ -253,6 +253,60 @@ push()
 	git push $args $repository $branches
 }
 
+delete()
+{
+	shift
+
+	while test "$#" -gt 0; do
+		case $1 in
+			-n | --dry-run)
+				args="$args --dry-run"
+				shift
+				;;
+
+			-* | --*)
+				echo "delete: unknown option $1"
+				exit 1
+				;;
+
+			*)
+				repository="$1"
+				shift
+				break
+				;;
+		esac
+	done
+
+	if test "x$remote" = "x"; then
+		echo "usage: git topic delete [options] REMOTE"
+		exit 1
+	fi
+
+	args="$args --delete"
+
+	branches="${remote}base"
+
+	while read branch; do
+		if test "x${branch###}" != "x${branch}"; then
+			continue
+		fi
+
+		if test "x${branch##${prefix}}" == "x${branch}"; then
+			echo "not a topic branch: $branch"
+			continue
+		fi
+
+		branch=${branch##${prefix}}
+
+		branches="$branches ${remote}${branch}"
+	done < .git/topic-branches
+
+	branches="$branches ${remote}master ${remote}work"
+
+	echo "deleting $branches from $repository"
+	git push $args $repository $branches
+}
+
 usage()
 {
 	echo "usage: git topic [command]"
@@ -315,6 +369,10 @@ case $1 in
 
 	push)
 		push "$@"
+		;;
+
+	delete)
+		delete "$@"
 		;;
 
 	*)
