@@ -56,6 +56,10 @@ rebase()
 		old=${prefix}base
 	fi
 
+	if test -z "$new"; then
+		new=${prefix}base
+	fi
+
 	if ! git rev-parse --verify --quiet $old > /dev/null 2>&1; then
 		echo "ERROR: old base ($old) not found"
 		return 1
