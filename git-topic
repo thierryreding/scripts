@@ -2,10 +2,40 @@
 
 prefix=staging/
 
+git_branch_exists()
+{
+	for branch in "$@"; do
+		if ! git rev-parse --verify --quiet $1 > /dev/null 2>&1; then
+			return 1
+		fi
+	done
+}
+
+init()
+{
+	if test "x$2" = "x"; then
+		echo "usage: git topic $0 BASE"
+		return
+	fi
+
+	if git_branch_exists ${prefix}base ${prefix}master; then
+		echo "already initialized"
+		return
+	fi
+
+	git branch ${prefix}base $2
+	git branch ${prefix}master $2
+}
+
 rebase()
 {
 	dry_run=no
 	shift;
+
+	if ! git_branch_exists ${prefix}base ${prefix}master; then
+		echo "topic branches not initialized, run git topic init first"
+		return
+	fi
 
 	while test "$#" -gt 0; do
 		case $1 in
@@ -232,6 +262,10 @@ if test "x$errors" = "xyes"; then
 fi
 
 case $1 in
+	init)
+		init "$@"
+		;;
+
 	rebase)
 		rebase "$@"
 		;;
