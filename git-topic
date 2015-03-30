@@ -1,6 +1,7 @@
 #!/bin/sh
 
 prefix=staging/
+remote=staging/
 
 git_branch_exists()
 {
@@ -216,32 +217,40 @@ push()
 				;;
 
 			*)
-				remote="$1"
+				repository="$1"
 				shift
 				break
 				;;
 		esac
 	done
 
-	if test "x$remote" = "x"; then
-		echo "usage: git topic push [options] REMOTE"
+	if test "x$repository" = "x"; then
+		echo "usage: git topic push [options] REPOSITORY"
 		exit 1
 	fi
 
-	branches="${prefix}base"
+	branches="${prefix}base:${remote}base"
 
 	while read branch; do
 		if test "x${branch###}" != "x${branch}"; then
 			continue
 		fi
 
-		branches="$branches $branch"
+		if test "x${branch##${prefix}}" == "x${branch}"; then
+			echo "not a topic branch: $branch"
+			continue
+		fi
+
+		branch=${branch##${prefix}}
+
+		branches="$branches ${prefix}${branch}:${remote}${branch}"
 	done < .git/topic-branches
 
-	branches="$branches ${prefix}master ${prefix}work"
+	branches="$branches ${prefix}master:${remote}master"
+	branches="$branches ${prefix}work:${remote}work"
 
-	echo "pushing $branches to $remote"
-	git push $args $remote $branches
+	echo "pushing $branches to $repository"
+	git push $args $repository $branches
 }
 
 usage()
@@ -253,6 +262,28 @@ if ! test -f .git/topic-branches; then
 	echo ".git/topic-branches does not exist"
 	exit 1
 fi
+
+while test $# -gt 0; do
+	if test -n "$prev"; then
+		eval "$prev=$1"
+		shift; prev=
+		continue
+	fi
+
+	case $1 in
+		--prefix)
+			prev=prefix
+			shift
+			;;
+
+		*)
+			break
+			;;
+	esac
+done
+
+remote=${prefix##*:}
+prefix=${prefix%%:*}
 
 errors=no
 
