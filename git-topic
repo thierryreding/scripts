@@ -130,10 +130,18 @@ rebase()
 	fi
 
 	if test "x$dry_run" = "xyes"; then
+		if ! git_branch_exists ${prefix}master; then
+			echo "running: git branch ${prefix}master ${prefix}base"
+		fi
+
 		echo "running: git checkout ${prefix}master"
 		echo "running: git branch ${prefix}master-old"
 		echo "running: git reset --hard $newref"
 	else
+		if ! git_branch_exists ${prefix}master; then
+			git branch ${prefix}master ${prefix}base
+		fi
+
 		git checkout ${prefix}master
 		git branch ${prefix}master-old
 		git reset --hard $newref
