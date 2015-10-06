@@ -3,6 +3,49 @@
 prefix=staging/
 remote=staging/
 
+git_find_tree()
+{
+	commit="$1"
+
+	git cat-file -p $commit | while read type hash; do
+		if test "x$type" = "xtree"; then
+			echo "$hash"
+			return
+		fi
+	done
+}
+
+git_find_object()
+{
+	tree="$1"
+	path="$2"
+
+	git cat-file -p $tree | while read mode type hash name; do
+		if test "x$name" = "x$path"; then
+			echo "$hash"
+			return
+		fi
+	done
+}
+
+git_find_blob()
+{
+	commit="$1"
+	path="$2"
+
+	tree=$(git_find_tree $commit)
+
+	for name in $(echo "$path" | tr "/" " "); do
+		hash=$(git_find_object "$tree" "$name")
+		type=$(git cat-file -t "$hash")
+		if test "x$type" = "xtree"; then
+			tree="$hash"
+		fi
+	done
+
+	echo "$hash"
+}
+
 git_branch_exists()
 {
 	for branch in "$@"; do
@@ -10,6 +53,66 @@ git_branch_exists()
 			return 1
 		fi
 	done
+}
+
+git_topic_list_branches()
+{
+	parent="$(git show-ref --heads --hash ${prefix}branches)"
+
+	if test -n "$parent"; then
+		prev=$(git_find_blob "$parent" branches)
+		git cat-file -p "$prev"
+	fi
+}
+
+git_topic_check_sanity()
+{
+	fatal="$1"
+	errors=no
+
+	branch="$(git show-ref --heads --hash ${prefix}branches)"
+	if test "x$branch" = "x"; then
+		echo "ERROR: branch ${prefix}branches does not exist, try running:"
+		echo "    $ git topic branches"
+
+		if test "x$fatal" = "xno"; then
+			return 1
+		else
+			exit 1
+		fi
+	fi
+
+	hash=$(git_find_blob ${prefix}branches branches)
+	if test "x$hash" = "x"; then
+		echo "ERROR: no topic branches defined, try running:"
+		echo "    $ git topic branches"
+
+		if test "x$fatal" = "xno"; then
+			return 1
+		else
+			exit 1
+		fi
+	fi
+
+	git_topic_list_branches | while read branch; do
+		case $branch in
+			branches | base | master | master-old | work)
+				echo "ERROR: branch ${branch} is special and can't be used as topic branch"
+				errors=yes
+				;;
+
+			*)
+				;;
+		esac
+	done
+
+	if test "x$errors" = "xyes"; then
+		if test "x$fatal" = "xno"; then
+			return 1
+		else
+			exit 1
+		fi
+	fi
 }
 
 init()
@@ -26,6 +129,64 @@ init()
 
 	git branch ${prefix}base $2
 	git branch ${prefix}master $2
+}
+
+branches()
+{
+	parent="$(git show-ref --heads --hash ${prefix}branches)"
+	branches="$(mktemp)"
+	message="$(mktemp)"
+
+	if test -n "$parent"; then
+		prev=$(git_find_blob "$parent" branches)
+		git cat-file -p "$prev" > "$branches"
+	fi
+
+	$EDITOR "$branches"
+
+	hash=$(git hash-object -t blob -w --path branches "$branches")
+
+	if test "x$hash" = "x$prev"; then
+		echo "No changes to commit."
+		rm "$message" "$branches"
+		return
+	fi
+
+	tree=$(echo -e "100644 blob $hash\tbranches" | git mktree)
+
+	echo -ne "\n\n" > "$message"
+
+	if test -n "$parent"; then
+		prev=$(git_find_tree "$parent")
+		git diff-tree --patch-with-stat "$prev" "$tree" | while read line; do
+			echo "# $line"
+		done >> "$message"
+	else
+		echo "# Initial commit." >> "$message"
+	fi
+
+	$EDITOR "$message"
+
+	if test -n "$parent"; then
+		hash=$(sed '/^#/d' < "$message" | git commit-tree -p "$parent" "$tree")
+	else
+		hash=$(sed '/^#/d' < "$message" | git commit-tree "$tree")
+	fi
+
+	echo "Updating refs/heads/${prefix}branches to $hash"
+	git update-ref refs/heads/${prefix}branches "$hash"
+
+	rm "$message" "$branches"
+}
+
+sanity()
+{
+	if git_topic_check_sanity no; then
+		echo "Sanity checks passed."
+		return 0
+	else
+		return 1
+	fi
 }
 
 rebase()
@@ -97,10 +258,12 @@ rebase()
 	fi
 
 	if test "x$newhash" != "x$oldhash"; then
-		while read branch; do
+		git_topic_list_branches | while read branch; do
 			if test "x${branch###}" != "x${branch}"; then
 				continue
 			fi
+
+			branch=${prefix}$branch
 
 			echo "rebasing $branch onto $newref (old: $oldref)"
 
@@ -117,7 +280,7 @@ rebase()
 					$SHELL <&- < /dev/tty
 				fi
 			fi
-		done < .git/topic-branches
+		done
 
 		if test "x$dry_run" = "xyes"; then
 			echo "running: git branch -D ${prefix}base"
@@ -148,10 +311,12 @@ rebase()
 		git reset --hard $newref
 	fi
 
-	while read branch; do
+	git_topic_list_branches | while read branch; do
 		if test "x${branch###}" != "x${branch}"; then
 			continue
 		fi
+
+		branch=${prefix}$branch
 
 		if test "x$dry_run" = "xyes"; then
 			echo "running: git merge --no-ff $branch"
@@ -162,7 +327,7 @@ rebase()
 				$SHELL <&- < /dev/tty
 			fi
 		fi
-	done < .git/topic-branches
+	done
 
 	if test "x$dry_run" = "xyes"; then
 		echo "running: git checkout --quiet ${prefix}work"
@@ -193,6 +358,16 @@ rebase()
 	fi
 
 	echo "git-topic: rebase: all done"
+}
+
+git_topic_push_list()
+{
+	git_topic_list_branches | while read branch; do
+		if test "x${branch###}" = "x${branch}"; then
+			echo -n "${sep}${prefix}${branch}:${remote}${branch}"
+			sep=' '
+		fi
+	done
 }
 
 push()
@@ -229,28 +404,23 @@ push()
 		exit 1
 	fi
 
-	branches="${prefix}base:${remote}base"
-
-	while read branch; do
-		if test "x${branch###}" != "x${branch}"; then
-			continue
-		fi
-
-		if test "x${branch##${prefix}}" == "x${branch}"; then
-			echo "not a topic branch: $branch"
-			continue
-		fi
-
-		branch=${branch##${prefix}}
-
-		branches="$branches ${prefix}${branch}:${remote}${branch}"
-	done < .git/topic-branches
-
+	branches="${prefix}branches:${remote}branches ${prefix}base:${remote}base"
+	branches="$branches $(git_topic_push_list)"
 	branches="$branches ${prefix}master:${remote}master"
 	branches="$branches ${prefix}work:${remote}work"
 
 	echo "pushing $branches to $repository"
 	git push $args $repository $branches
+}
+
+git_topic_delete_list()
+{
+	git_topic_list_branches | while read branch; do
+		if test "x${branch###}" = "x${branch}"; then
+			echo -n "${sep}${remote}${branch}"
+			sep=' '
+		fi
+	done
 }
 
 delete()
@@ -284,23 +454,8 @@ delete()
 
 	args="$args --delete"
 
-	branches="${remote}base"
-
-	while read branch; do
-		if test "x${branch###}" != "x${branch}"; then
-			continue
-		fi
-
-		if test "x${branch##${prefix}}" == "x${branch}"; then
-			echo "not a topic branch: $branch"
-			continue
-		fi
-
-		branch=${branch##${prefix}}
-
-		branches="$branches ${remote}${branch}"
-	done < .git/topic-branches
-
+	branches="${remote}branches ${remote}base"
+	branches="$branches $(git_topic_delete_list)"
 	branches="$branches ${remote}master ${remote}work"
 
 	echo "deleting $branches from $repository"
@@ -311,11 +466,6 @@ usage()
 {
 	echo "usage: git topic [command]"
 }
-
-if ! test -f .git/topic-branches; then
-	echo ".git/topic-branches does not exist"
-	exit 1
-fi
 
 while test $# -gt 0; do
 	if test -n "$prev"; then
@@ -339,28 +489,28 @@ done
 remote=${prefix##*:}
 prefix=${prefix%%:*}
 
-errors=no
+case $1 in
+	init | branches | sanity)
+		;;
 
-while read branch; do
-	case $branch in
-		${prefix}base | ${prefix}master | ${prefix}work)
-			echo "ERROR: branch ${branch} is special and can't be used in .git/topic-branches"
-			errors=yes
-			;;
-
-		*)
-			;;
-	esac
-done < .git/topic-branches
-
-if test "x$errors" = "xyes"; then
-	echo "ERROR: sanity checks failed for .git/topic-branches, aborting..."
-	exit 1
-fi
+	*)
+		if ! git_topic_check_sanity yes; then
+			exit 1
+		fi
+		;;
+esac
 
 case $1 in
 	init)
 		init "$@"
+		;;
+
+	branches)
+		branches "$@"
+		;;
+
+	sanity)
+		sanity "$@"
 		;;
 
 	rebase)
