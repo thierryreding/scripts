@@ -3,6 +3,8 @@
 ARCH=
 SOC=
 BOARDS=
+incremental=no
+strict=no
 
 while test $# -gt 0; do
 	if test -n "$prev"; then
@@ -23,6 +25,16 @@ while test $# -gt 0; do
 
 		--jobs)
 			prev=JOBS
+			shift
+			;;
+
+		--strict)
+			strict=yes
+			shift
+			;;
+
+		--incremental)
+			incremental=yes
 			shift
 			;;
 
@@ -75,18 +87,50 @@ awk "/^#/ || /^$/ { next }; $FILTER { print \$4\" \"\$5\" \"\$7 }" boards.cfg |
 	while read soc vendor board; do
 		builddir="build/${soc}/${board}"
 
+		if test -d "$builddir"; then
+			if test "x$incremental" = "xno"; then
+				rm -rf "$builddir"
+			fi
+		fi
+
 		if ! test -d "$builddir"; then
 			mkdir -p "$builddir"
+			incremental=no
 		fi
 
 		echo -en "building \033[35m${soc}\033[0m/\033[33m${board}\033[0m..."
 
-		make CROSS_COMPILE=${CROSS_COMPILE} O="$builddir" "${board}_config" -j$JOBS > "$builddir/build.log" 2>&1
-		make CROSS_COMPILE=${CROSS_COMPILE} O="$builddir" -j$JOBS >> "$builddir/build.log" 2>&1
+		if test "x$incremental" = "xno"; then
+			make CROSS_COMPILE=${CROSS_COMPILE} O="$builddir" "${board}_defconfig" -j$JOBS > "$builddir/config.log" 2>&1
+		fi
 
-		if test "x$?" != "x0"; then
-			echo -e "\033[1;31mfailed ($ret)\033[0m"
+		(
+			# redirect stdout to stderr and stderr to stdout so
+			# that tee can write stderr to error.log (tee reads
+			# only stdout via the pipe)
+			make CROSS_COMPILE=${CROSS_COMPILE} O="$builddir" -j$JOBS \
+				3>&1 1>&2 2>&3 | tee "$builddir/error.log"
+			# need $PIPESTATUS here because $? contains tee's exit code
+			exit $PIPESTATUS
+		) &> "$builddir/build.log"
+		rc=$?
+
+		if test "x$rc" != "x0"; then
+			echo -e "\033[1;31mfailed ($rc)\033[0m"
+			rc=77
+			break
 		else
-			echo -e "\033[1;32mdone\033[0m"
+			if test -s "$builddir/error.log"; then
+				echo -e "\033[1;33mdone ($rc)\033[0m"
+
+				if test "x$strict" = "xyes"; then
+					rc=77
+					break
+				fi
+			else
+				echo -e "\033[1;32mdone\033[0m"
+			fi
 		fi
 	done
+
+exit $rc
