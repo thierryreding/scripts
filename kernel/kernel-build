@@ -1,0 +1,261 @@
+#!/bin/sh
+
+PATH=~/pbs-stage1/bin:$PATH
+export PATH
+
+verbose=no
+random=no
+strict=no
+clean=no
+
+usage() {
+	echo "usage: $1 [options]"
+}
+
+while test $# -ne 0; do
+	if test -n "$prev"; then
+		eval "$prev=$1"
+		shift; prev=
+		continue
+	fi
+
+	case $1 in
+		--arch | -a)
+			prev=ARCH
+			shift
+			;;
+
+		--clean | -c)
+			clean=yes
+			shift
+			;;
+
+		--config | -C)
+			prev=CONFIG
+			shift
+			;;
+
+		--jobs | -j)
+			prev=JOBS
+			shift
+			;;
+
+		--output | -o)
+			prev=OUTPUT
+			shift
+			;;
+
+		--random | -r)
+			random=yes
+			shift
+			;;
+
+		--strict | -S)
+			strict=yes
+			shift
+			;;
+
+		--verbose | -v)
+			verbose=yes
+			shift
+			;;
+
+		*)
+			usage $0
+			exit 1
+			;;
+	esac
+done
+
+if test -z "$ARCH"; then
+	echo "ERROR: architecture not specified"
+	exit 1;
+fi
+
+if test -z "$CROSS_COMPILE"; then
+	for target in $ARCH-linux-gnu $ARCH-unknown-linux-gnu; do
+		if type -p $target-gcc > /dev/null 2>&1; then
+			CROSS_COMPILE=$(type -p $target-gcc)
+			CROSS_COMPILE=${CROSS_COMPILE%gcc}
+			break
+		fi
+	done
+
+	if test -z "$CROSS_COMPILE"; then
+		case $ARCH in
+			arm)
+				CROSS_COMPILE=armv7l-unknown-linux-gnueabihf-
+				;;
+
+			arm64)
+				CROSS_COMPILE=aarch64-unknown-linux-gnu-
+				;;
+
+			s390)
+				CROSS_COMPILE=s390-ibm-linux-gnu-
+				;;
+
+			xtensa)
+				CROSS_COMPILE=xtensa-unknown-linux-uclibc-
+				;;
+
+			x86)
+				CROSS_COMPILE=native
+				;;
+
+			*)
+				;;
+		esac
+	fi
+
+	if test -z "$CROSS_COMPILE"; then
+		echo "ERROR: Cross-compilation toolchain not found! Please set"
+		echo "       the CROSS_COMPILE environment variable."
+		exit 1
+	else
+		echo "Cross-compiler detected: $CROSS_COMPILE"
+	fi
+fi
+
+if test "$CROSS_COMPILE" = "native"; then
+	CROSS_COMPILE=
+fi
+
+export ARCH CROSS_COMPILE
+
+if test -z "$JOBS"; then
+	JOBS=$(lscpu | awk '/^CPU\(s\):/ { print $2 }')
+fi
+
+if test -z "$OUTPUT"; then
+	OUTPUT=build
+fi
+
+build_board() {
+	local builddir="$1"
+	local config="$2"
+	local args=
+
+	args="$args O=${builddir}"
+
+	if test "x$strict" = "xyes"; then
+		args="$args KCFLAGS=-Werror"
+	fi
+
+	if test "x$clean" = "xyes"; then
+		rm -rf "${builddir}"
+	fi
+
+	if ! test -d "${builddir}"; then
+		mkdir -p "${builddir}"; rc=$?
+		if test $rc -ne 0; then
+			return $rc
+		fi
+	fi
+
+	(
+		# redirect stdout to stderr and stderr to stdout so that tee
+		# can write stderr to error.log (tee reads only stdout via
+		# the pipe)
+		(
+			make $args -j $JOBS $config
+			make $args -j $JOBS
+		) 3>&1 1>&2 2>&3 | tee "$builddir/error.log"
+		# need $PIPESTATUS here because $? contains the exit code from tee
+		exit $PIPESTATUS
+	)
+
+	return $?
+}
+
+if test "x$random" = "xyes"; then
+	if test ! -d "${OUTPUT}/${ARCH}"; then
+		mkdir -p "${OUTPUT}/${ARCH}"
+	fi
+
+	configdir="$(mktemp -d -p ${OUTPUT}/${ARCH})"
+
+	make O="${configdir}" randconfig 2> "${configdir}/seed" > /dev/null
+	read seed < "${configdir}/seed"
+	seed=${seed#KCONFIG_SEED=}
+
+	builddir="${OUTPUT}/${ARCH}/${seed}"
+	mv "${configdir}" "$builddir"
+
+	echo -en "building \033[1;35m$ARCH\033[0m/"
+	echo -en "\033[1;34mrandconfig\033[0m \033[1;36m$seed\033[0m..."
+
+	build_board $builddir oldconfig &> "$builddir/build.log"; rc=$?
+
+#	(
+#		# redirect stdout to stderr and stderr to stdout so that tee
+#		# can write stderr to error.log (tee reads only stdout via
+#		# the pipe)
+#		(
+#			make O="$builddir" -j $JOBS clean
+#			make O="$builddir" -j $JOBS $config
+#			make O="$builddir" -j $JOBS
+#		) 3>&1 1>&2 2>&3 | tee "$builddir/error.log"
+#		# need $PIPESTATUS here because $? contains the exit code from tee
+#		exit $PIPESTATUS
+#	) &> "$builddir/build.log"
+#	rc=$?
+
+	if test "x$rc" != "x0"; then
+		echo -e "\033[1;31mfailed ($rc)\033[0m"
+	else
+		if test -s "$builddir/error.log"; then
+			echo -e "\033[1;33mdone\033[0m"
+		else
+			echo -e "\033[1;32mdone\033[0m"
+		fi
+	fi
+
+	exit 0
+fi
+
+if test -z "$CONFIG"; then
+	for defconfig in "arch/${ARCH}/configs/"*_defconfig; do
+		config="${defconfig##*/}"
+
+		builddir="${OUTPUT}/${ARCH}/${config}"
+		mkdir -p "$builddir"
+
+		echo -en "building \033[1;35m${ARCH}\033[0m/"
+		echo -en "\033[1;34m${config}\033[0m ($JOBS jobs)..."
+
+		build_board $builddir $config &> "$builddir/build.log"; rc=$?
+
+		if test "x$rc" != "x0"; then
+			echo -e "\033[1;31mfailed ($rc)\033[0m"
+		else
+			if test -s "$builddir/error.log"; then
+				echo -e "\033[1;33mdone\033[0m"
+			else
+				echo -e "\033[1;32mdone\033[0m"
+			fi
+		fi
+	done
+else
+	builddir="${OUTPUT}/${ARCH}/${CONFIG}"
+	mkdir -p "$builddir"
+
+	if test "x$verbose" = "xno"; then
+		echo -en "building \033[1;35m${ARCH}\033[0m/"
+		echo -en "\033[1;34m${CONFIG}\033[0m ($JOBS jobs)..."
+	fi
+
+	build_board $builddir $CONFIG &> "$builddir/build.log"; rc=$?
+
+	if test "x$verbose" = "xno"; then
+		if test "x$rc" != "x0"; then
+			echo -e "\033[1;31mfailed ($rc)\033[0m"
+		else
+			if test -s "$builddir/error.log"; then
+				echo -e "\033[1;33mdone\033[0m"
+			else
+				echo -e "\033[1;32mdone\033[0m"
+			fi
+		fi
+	fi
+fi

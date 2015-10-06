@@ -1,0 +1,3 @@
+arm tegra_defconfig
+arm multi_v7_defconfig
+arm64 defconfig

@@ -1,0 +1,11 @@
+arm multi_v7_defconfig
+arm allmodconfig
+arm64 defconfig
+ia64 defconfig
+microblaze defconfig
+s390 defconfig
+sparc defconfig
+x86 defconfig
+x86 allmodconfig
+xtensa defconfig
+xtensa allmodconfig

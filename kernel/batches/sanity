@@ -1,0 +1,6 @@
+arm multi_v7_defconfig
+arm allmodconfig
+arm64 defconfig
+arm64 allmodconfig
+x86 defconfig
+x86 allmodconfig

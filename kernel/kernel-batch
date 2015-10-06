@@ -1,0 +1,115 @@
+#!/bin/sh
+
+usage()
+{
+	echo "usage: $1 [options]"
+}
+
+while test $# -ne 0; do
+	if test -n "$prev"; then
+		eval "$prev=$1"
+		shift; prev=
+		continue
+	fi
+
+	case $1 in
+		--output)
+			prev=OUTPUT
+			shift
+			;;
+
+		*)
+			usage $0
+			exit 1
+			;;
+	esac
+done
+
+if test -z "$OUTPUT"; then
+	OUTPUT=build/$(git describe)
+fi
+
+while read arch config; do
+	if test "${arch###}" != "${arch}"; then
+		continue
+	fi
+
+	case $arch in
+		arm)
+			CROSS_COMPILE=armv7l-unknown-linux-gnueabihf-
+			;;
+
+		arm64)
+			CROSS_COMPILE=aarch64-unknown-linux-gnu-
+			;;
+
+		ia64)
+			CROSS_COMPILE=ia64-unknown-linux-gnu-
+			;;
+
+		microblaze)
+			CROSS_COMPILE=microblaze-unknown-linux-gnu-
+			;;
+
+		s390)
+			CROSS_COMPILE=s390-ibm-linux-gnu-
+			;;
+
+		sparc)
+			CROSS_COMPILE=sparc-unknown-linux-gnu-
+			;;
+
+		x86)
+			CROSS_COMPILE=
+			;;
+
+		xtensa)
+			CROSS_COMPILE=xtensa-unknown-linux-uclibc-
+			;;
+	esac
+
+	builddir="${OUTPUT}/${arch}/${config}"
+
+	if test -d "$builddir"; then
+		rm -rf "$builddir"
+	fi
+
+	mkdir -p "$builddir"
+
+	ARCH=$arch
+	JOBS=13
+
+	echo -en "building \033[1;35m$arch\033[0m using \033[1;34m$config\033[0m..."
+	export ARCH CROSS_COMPILE
+
+	(
+		# redirect stdout to stderr and stderr to stdout so that tee
+		# can write stderr to error.log (tee reads only stdout via
+		# the pipe)
+		(
+			make O="$builddir" -j $JOBS clean
+			make O="$builddir" -j $JOBS $config
+			make O="$builddir" -j $JOBS -k
+		) 3>&1 1>&2 2>&3 | tee "$builddir/error.log"
+		# need $PIPESTATUS here because $? contains the exit code from tee
+		exit $PIPESTATUS
+	) &> "$builddir/build.log"
+	rc=$?
+
+#	(
+#		make O="$builddir" -j $JOBS clean
+#		make O="$builddir" -j $JOBS $config
+#		make O="$builddir" -j $JOBS
+#	) > "$builddir/build.log" 2>&1
+#	rc=$?
+
+	if test "x$rc" != "x0"; then
+		echo -e "\033[1;31mfailed ($rc)\033[0m"
+	else
+		if test -s "$builddir/error.log"; then
+			echo -e "\033[1;33mdone\033[0m"
+		else
+			echo -e "\033[1;32mdone\033[0m"
+		fi
+	fi
+done
