@@ -1,0 +1,60 @@
+#!/bin/bash
+
+set -e
+set -x
+
+if test -z "$1" -o -z "$2"; then
+	echo "usage: $0 BASE TAG"
+	exit 1
+fi
+
+base="$1"
+tag="$2"
+
+repository=git://git.kernel.org/pub/scm/linux/kernel/git/thierry.reding/linux-pwm.git
+remote=pwm
+
+to="Linus Torvalds <torvalds@linux-foundation.org>"
+cc="linux-pwm@vger.kernel.org"
+cc="$cc, linux-kernel@vger.kernel.org"
+
+message="pull-request/$tag"
+name=$(git config --get user.name)
+email=$(git config --get user.email)
+date=$(date -R)
+
+if ! git config --get sendemail.from > /dev/null 2>&1; then
+	identity=$(git config --get sendemail.identity)
+	from=$(git config --get sendemail.$identity.from)
+else
+	from=$(git config --get sendemail.from)
+fi
+
+exec 3> "$message"
+
+echo "From $email $date" >&3
+echo "From: $from" >&3
+echo "To: $to" >&3
+echo "Cc: $cc" >&3
+git for-each-ref --format='Subject: [GIT PULL] %(subject)' refs/tags/$tag >&3
+echo "" >&3
+echo "Hi Linus," >&3
+echo "" >&3
+
+git request-pull $base $repository $tag | awk '
+  BEGIN {
+    count = 0
+  }
+  /^-{64}$/ {
+    if (count++ == 0) {
+      print "Thanks,"
+      print "Thierry"
+      print ""
+    }
+  }
+  {
+    print
+  }
+' >&3
+
+exec 3>&-
