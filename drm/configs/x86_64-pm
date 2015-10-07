@@ -1,3 +1,4 @@
 include x86_64.include
+include pm.include
 kconfig olddefconfig
 kbuild

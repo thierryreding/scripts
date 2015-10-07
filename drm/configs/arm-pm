@@ -1,3 +1,4 @@
 include arm.include
+include pm.include
 kconfig olddefconfig
 kbuild

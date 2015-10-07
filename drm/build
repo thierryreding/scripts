@@ -79,6 +79,8 @@ function cross_compile_prepare()
 {
 	local path key value
 
+	ARCH=$1
+
 	if test -f "$HOME/.cross-compile"; then
 		while read key value; do
 			key="${key%:}"
@@ -121,15 +123,20 @@ function make()
 {
 	(
 		command make "$@" 3>&1 1>&2 2>&3 | tee -a "$KBUILD_OUTPUT/error.log"
-		exit $PIPE_STATUS
+		exit $PIPESTATUS
 	) &>> "$KBUILD_OUTPUT/build.log"
+}
+
+function include()
+{
+	source "${configdir}/$1"
 }
 
 function kconfig()
 {
 	case $1 in
 		architecture)
-			ARCH=$2
+			cross_compile_prepare $2
 			;;
 
 		*config)
@@ -154,6 +161,11 @@ function kconfig()
 	esac
 }
 
+function kbuild()
+{
+	make ARCH=$ARCH CROSS_COMPILE=$CROSS_COMPILE O=$KBUILD_OUTPUT -j $JOBS
+}
+
 if test -z "$configs"; then
 	for config in "${configdir}"/*; do
 		configs="$configs ${config##${configdir}/}"
@@ -169,7 +181,6 @@ function log_status()
 {
 	if test "x$1" != "x0"; then
 		echo -e "${RED}failed ($1)${RESET}"
-		break
 	else
 		if test -s "$KBUILD_OUTPUT/error.log"; then
 			echo -e "${YELLOW}done ($1)${RESET}"
@@ -180,6 +191,12 @@ function log_status()
 }
 
 for config in $configs; do
+	# configuration files ending in .include are templates included in
+	# other configurations, so they should not be built themselves
+	if test "${config%.include}" != "${config}"; then
+		continue
+	fi
+
 	KBUILD_OUTPUT="${outputdir}/$config"
 	CONFIG_FILE="${configdir}/${config}"
 
@@ -207,17 +224,8 @@ for config in $configs; do
 		rm "$KBUILD_OUTPUT/error.log"
 	fi
 
-	log_action "configuring"
-	source "$CONFIG_FILE"
-	log_status $?
-
 	log_action "building"
-	cross_compile_prepare
-
-	make ARCH=$ARCH CROSS_COMPILE=$CROSS_COMPILE O="$KBUILD_OUTPUT" \
-		-j $JOBS; rc=$?
-
+	source "$CONFIG_FILE"; rc=$?
 	cross_compile_cleanup
 	log_status $rc
-
 done
