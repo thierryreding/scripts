@@ -1,0 +1,16 @@
+kconfig architecture mips
+kconfig allnoconfig
+# basic configuration
+kconfig enable DEBUG_FS
+kconfig enable SYSFS
+# architecture configuration
+kconfig disable SGI_IP22
+# for PWM_IMG
+kconfig enable MFD_SYSCON
+# for PWM_JZ4740
+kconfig enable MACH_INGENIC
+kconfig enable JZ4740_QI_LB60
+# PWM drivers
+kconfig enable PWM
+kconfig enable PWM_IMG
+kconfig enable PWM_JZ4740

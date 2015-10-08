@@ -1,0 +1,17 @@
+kconfig architecture arm
+kconfig allnoconfig
+# basic configuration
+kconfig enable DEBUG_FS
+kconfig enable MMU
+kconfig enable SYSFS
+# architecture configuration
+kconfig disable ARCH_VERSATILE
+kconfig enable ARCH_CLPS711X
+kconfig enable ARCH_AUTCPU12
+kconfig enable ARCH_CDB89712
+kconfig enable ARCH_CLEP7312
+kconfig enable ARCH_EDB7211
+kconfig enable ARCH_P720T
+# PWM drivers
+kconfig enable PWM
+kconfig enable PWM_CLPS711X

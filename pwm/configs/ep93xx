@@ -1,0 +1,3 @@
+include ep93xx.include
+kconfig olddefconfig
+kbuild

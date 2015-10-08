@@ -1,0 +1,20 @@
+kconfig architecture x86
+kconfig allnoconfig
+# basic configuration
+kconfig enable DEBUG_FS
+kconfig enable SYSFS
+# for PWM_CRC
+kconfig enable GPIOLIB
+kconfig enable I2C
+kconfig enable INTEL_SOC_PMIC
+# for PWM_LPSS_PCI
+kconfig enable PCI
+# for PWM_LPSS_PLATFORM
+kconfig enable ACPI
+# PWM drivers
+kconfig enable PWM
+kconfig enable PWM_CRC
+kconfig enable PWM_LPSS
+kconfig enable PWM_LPSS_PCI
+kconfig enable PWM_LPSS_PLATFORM
+kconfig enable PWM_PCA9685

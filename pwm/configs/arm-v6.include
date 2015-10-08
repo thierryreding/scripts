@@ -1,0 +1,16 @@
+kconfig architecture arm
+kconfig allnoconfig
+# basic configuration
+kconfig enable DEBUG_FS
+kconfig enable MMU
+kconfig enable SYSFS
+# architecture configuration
+kconfig disable ARCH_VERSATILE
+kconfig enable ARCH_MULTIPLATFORM
+kconfig enable ARCH_MULTI_V6
+# for PWM_BCM2835
+kconfig enable ARCH_BCM
+kconfig enable ARCH_BCM2835
+# PWM drivers
+kconfig enable PWM
+kconfig enable PWM_BCM2835

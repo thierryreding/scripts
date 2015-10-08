@@ -1,0 +1,3 @@
+include clps711x.include
+kconfig olddefconfig
+kbuild
