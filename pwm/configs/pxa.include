@@ -88,3 +88,5 @@ kconfig enable MACH_ZIPIT2
 # PWM drivers
 kconfig enable PWM
 kconfig enable PWM_PXA
+# PWM users
+include users.include

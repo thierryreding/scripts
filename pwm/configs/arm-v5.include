@@ -4,6 +4,7 @@ kconfig allnoconfig
 kconfig enable DEBUG_FS
 kconfig enable MMU
 kconfig enable SYSFS
+kconfig enable I2C
 # architecture configuration
 kconfig disable ARCH_VERSATILE
 kconfig enable ARCH_MULTIPLATFORM
@@ -14,3 +15,7 @@ kconfig enable ARCH_MXS
 # PWM drivers
 kconfig enable PWM
 kconfig enable PWM_MXS
+# PWM users
+include users.include
+kconfig enable FB
+kconfig enable FB_SSD1307

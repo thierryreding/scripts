@@ -93,3 +93,12 @@ kconfig enable PWM_TIEHRPWM
 kconfig enable PWM_TWL
 kconfig enable PWM_TWL_LED
 kconfig enable PWM_VT8500
+# PWM users
+include users.include
+kconfig enable COMMON_CLK_PWM
+kconfig enable DRM
+kconfig enable MFD_ATMEL_HLCDC
+kconfig enable DRM_ATMEL_HLCDC
+kconfig enable HWMON
+kconfig enable SENSORS_PWM_FAN
+kconfig enable GPIO_LP3943

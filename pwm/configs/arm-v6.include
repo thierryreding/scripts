@@ -14,3 +14,5 @@ kconfig enable ARCH_BCM2835
 # PWM drivers
 kconfig enable PWM
 kconfig enable PWM_BCM2835
+# PWM users
+include users.include

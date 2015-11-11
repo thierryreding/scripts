@@ -6,3 +6,5 @@ kconfig enable SYSFS
 # PWM drivers
 kconfig enable PWM
 kconfig enable PWM_PUV3
+# PWM users
+include users.include

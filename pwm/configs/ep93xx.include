@@ -28,3 +28,5 @@ kconfig enable MACH_VISION_EP9307
 # PWM drivers
 kconfig enable PWM
 kconfig enable PWM_EP93XX
+# PWM users
+include users.include

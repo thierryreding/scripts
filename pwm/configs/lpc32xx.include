@@ -10,3 +10,5 @@ kconfig enable ARCH_LPC32XX
 # PWM drivers
 kconfig enable PWM
 kconfig enable PWM_LPC32XX
+# PWM users
+include users.include

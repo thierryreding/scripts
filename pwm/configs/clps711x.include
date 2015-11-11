@@ -15,3 +15,5 @@ kconfig enable ARCH_P720T
 # PWM drivers
 kconfig enable PWM
 kconfig enable PWM_CLPS711X
+# PWM users
+include users.include

@@ -18,3 +18,8 @@ kconfig enable PWM_LPSS
 kconfig enable PWM_LPSS_PCI
 kconfig enable PWM_LPSS_PLATFORM
 kconfig enable PWM_PCA9685
+# PWM users
+include users.include
+kconfig enable DRM
+kconfig enable DRM_I915
+kconfig enable MFD_INTEL_SOC_PMIC

@@ -10,3 +10,5 @@ kconfig enable BFIN_GPTIMERS
 # PWM drivers
 kconfig enable PWM
 kconfig enable PWM_BFIN
+# PWM users
+include users.include

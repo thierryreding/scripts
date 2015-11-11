@@ -14,3 +14,5 @@ kconfig enable JZ4740_QI_LB60
 kconfig enable PWM
 kconfig enable PWM_IMG
 kconfig enable PWM_JZ4740
+# PWM users
+include users.include
