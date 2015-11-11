@@ -163,7 +163,7 @@ function kconfig()
 
 function kbuild()
 {
-	make ARCH=$ARCH CROSS_COMPILE=$CROSS_COMPILE O=$KBUILD_OUTPUT -j $JOBS
+	make ARCH=$ARCH CROSS_COMPILE=$CROSS_COMPILE O=$KBUILD_OUTPUT C=1 -j $JOBS
 }
 
 if test -z "$configs"; then
