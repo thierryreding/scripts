@@ -3,6 +3,9 @@ kconfig allnoconfig
 # basic configuration
 kconfig enable DEBUG_FS
 kconfig enable SYSFS
+# architecture configuration
+kconfig disable PUV3_DB0913
+kconfig enable PUV3_NB0916
 # PWM drivers
 kconfig enable PWM
 kconfig enable PWM_PUV3

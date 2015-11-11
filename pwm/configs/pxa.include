@@ -10,7 +10,7 @@ kconfig enable ARCH_PXA
 kconfig enable MACH_PXA27X_DT
 kconfig enable MACH_PXA3XX_DT
 kconfig enable ARCH_LUBBOCK
-kconfig enable MACH_MAINTSTONE
+kconfig enable MACH_MAINSTONE
 kconfig enable MACH_ZYLONITE
 kconfig enable MACH_ZYLONITE300
 kconfig enable MACH_ZYLONITE320
@@ -57,6 +57,7 @@ kconfig enable MACH_EZX_A910
 kconfig enable MACH_EZX_E6
 kconfig enable MACH_EZX_E2
 kconfig enable MACH_MP900C
+kconfig enable ARCH_PXA_PALM
 kconfig enable MACH_PALMTE2
 kconfig enable MACH_PALMTC
 kconfig enable MACH_PALMT5
