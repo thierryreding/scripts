@@ -43,7 +43,26 @@ if test -z "$configs"; then
 	done
 fi
 
-find drivers/pwm -name '*.c' | while read source; do
+find_users()
+{
+	git grep -l "#.*include.*$1" | while read file; do
+		case "$file" in
+			*.c)
+				echo "$file"
+				;;
+
+			*.h)
+				find_users "${file##*/}"
+				;;
+
+			*)
+				echo "WARNING: $file"
+				;;
+		esac
+	done
+}
+
+find_users "linux/pwm.h" | while read source; do
 	base="${source%.c}"
 	object="${base}.o"
 
@@ -62,16 +81,3 @@ find drivers/pwm -name '*.c' | while read source; do
 		echo "$source is not compiled"
 	fi
 done
-
-#for config in $configs; do
-#	KBUILD_OUTPUT="${outputdir}/${config}"
-#
-#	find drivers/gpu/drm -name '*.c' | while read source; do
-#		base="${source%.c}"
-#		object="${base}.o"
-#
-#		if ! test -f "$KBUILD_OUTPUT/$object"; then
-#			echo "$config: $source is not compiled"
-#		fi
-#	done
-#done
