@@ -1,0 +1,184 @@
+#!/bin/sh
+
+topdir=$(cd ${0%/*}/.. && pwd)
+. $topdir/lib/cross-compile.sh
+
+prefix=/usr
+libdirs="${prefix}/lib /lib"
+
+while test $# -gt 0; do
+	if test -n "$prev"; then
+		eval "$prev=$1"
+		prev=; shift
+		continue
+	fi
+
+	case $1 in
+		-a | --arch)
+			prev=ARCH
+			shift
+			;;
+
+		-o | --output)
+			prev=KBUILD_OUTPUT
+			shift
+			;;
+
+		*)
+			echo "unknown: $1"
+			shift
+			;;
+	esac
+done
+
+function usage()
+{
+	echo "usage: $1 [options]"
+	echo ""
+	echo "options"
+	echo "  -a, --arch ARCH   select architecture"
+	echo "  -o, --output DIR  output directory"
+}
+
+if test -z "$ARCH"; then
+	usage $0
+	exit 1
+fi
+
+if ! test -d "$KBUILD_OUTPUT"; then
+	mkdir -p "$KBUILD_OUTPUT"
+fi
+
+KBUILD_OUTPUT=$(cd $KBUILD_OUTPUT && pwd)
+
+builddir="build/$ARCH"
+
+if test ! -d busybox.git; then
+	git clone git://git.busybox.net/busybox busybox.git
+fi
+
+pushd busybox.git
+git pull
+
+if ! test -d "$builddir"; then
+	mkdir -p "$builddir"
+fi
+
+function make_directory()
+{
+	local dest="$KBUILD_OUTPUT"
+	local directory="$1"
+
+	if ! test -d "$dest$directory"; then
+		echo "  MKDIR    $directory"
+		mkdir -p "$dest$directory"
+	fi
+}
+
+function make_symlink()
+{
+	local dest="$KBUILD_OUTPUT"
+	local target="$1"
+	local name="$2"
+
+	if ! test -L "$dest$name"; then
+		echo "  SYMLINK  $name --> $target"
+		ln -sf "$target" "$dest$name"
+	fi
+}
+
+make_directory /boot
+make_directory /dev
+make_directory /etc
+make_directory /etc/init.d
+make_directory /home
+make_directory /mnt
+make_directory /opt
+make_directory /proc
+make_directory /root
+make_directory /run
+make_directory /srv
+make_directory /sys
+make_directory /tmp
+make_directory /usr/bin
+make_directory /usr/lib
+make_directory /usr/sbin
+make_directory /var
+
+make_symlink usr/bin /bin
+make_symlink usr/lib /lib
+make_symlink usr/sbin /sbin
+
+cross_compile_prepare $ARCH
+make ARCH=$ARCH CROSS_COMPILE=$CROSS_COMPILE O="$builddir" CONFIG_PREFIX="$KBUILD_OUTPUT" defconfig
+make ARCH=$ARCH CROSS_COMPILE=$CROSS_COMPILE O="$builddir" CONFIG_PREFIX="$KBUILD_OUTPUT" -j13
+make ARCH=$ARCH CROSS_COMPILE=$CROSS_COMPILE O="$builddir" CONFIG_PREFIX="$KBUILD_OUTPUT" install
+
+SYSROOT=$(${CROSS_COMPILE}gcc -print-sysroot)
+
+for library in ld-linux-armhf.so.3 libc.so.6 libm.so.6; do
+	filename=$(${CROSS_COMPILE}gcc -print-file-name=$library)
+	filename=${filename#$SYSROOT}
+	destdir=${filename%/*}
+
+	cp -a "$SYSROOT$filename" "$KBUILD_OUTPUT$filename"
+
+	if test -L "$SYSROOT$filename"; then
+		target=$(readlink "$SYSROOT$filename")
+		dir="${target%/*}"
+
+		if test "$dir" != "$target"; then
+			destdir="$destdir/$dir/"
+		else
+			destdir="$destdir/"
+		fi
+
+		cp -a "$SYSROOT$destdir$target" "$KBUILD_OUTPUT$destdir$target"
+	fi
+done
+
+cross_compile_cleanup
+
+make_symlink sbin/init /init
+
+echo '#!/bin/sh
+
+echo -n "Mounting /dev..."
+mount -t devtmpfs none /dev
+echo "done"
+
+echo -n "Mounting /dev/shm..."
+echo -t tmpfs none /dev/shm
+echo "done"
+
+echo -n "Mounting /proc..."
+mount -t proc none /proc
+echo "done"
+
+echo -n "Setting up mdev as hotplug helper..."
+echo /sbin/mdev > /proc/sys/kernel/hotplug
+echo "done"
+
+echo -n "Mounting /sys..."
+mount -t sysfs none /sys
+echo "done"
+
+echo -n "Mounting /sys/kernel/debug..."
+mount -t debugfs none /sys/kernel/debug
+echo "done"
+
+echo -n "Mounting /tmp..."
+echo -t tmpfs none /tmp
+echo "done"
+
+echo -n "Mounting /run..."
+echo -t tmpfs none /run
+echo "done"
+' > "$KBUILD_OUTPUT/etc/init.d/rcS"
+
+chmod a+x "$KBUILD_OUTPUT/etc/init.d/rcS"
+
+echo '::sysinit:/etc/init.d/rcS
+::askfirst:-/bin/sh' > "$KBUILD_OUTPUT/etc/inittab"
+
+popd
