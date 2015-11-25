@@ -194,6 +194,11 @@ rebase()
 	dry_run=no
 	shift;
 
+	if test -d .git/rebase-apply; then
+		echo "directory .git/rebase-apply exists, rebase in progress?"
+		return 1
+	fi
+
 	if ! git_branch_exists ${prefix}base ${prefix}master; then
 		echo "topic branches not initialized, run git topic init first"
 		return
