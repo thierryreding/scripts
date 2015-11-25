@@ -1,0 +1,9 @@
+kconfig architecture avr32
+kconfig allnoconfig
+# basic configuration
+kconfig enable DEBUG_FS
+kconfig enable SYSFS
+kconfig enable I2C
+# architecture configuration
+# PWM drivers
+# PWM users

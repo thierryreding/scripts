@@ -1,0 +1,3 @@
+kconfig architecture arm
+kconfig s3c2410_defconfig
+kbuild
