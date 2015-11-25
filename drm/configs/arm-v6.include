@@ -1,0 +1,15 @@
+kconfig architecture arm
+kconfig allnoconfig
+kconfig enable DEBUG_FS
+kconfig enable DEBUG_SECTION_MISMATCH
+kconfig enable TICK_CPU_ACCOUNTING
+kconfig enable MMU
+kconfig disable ARCH_VERSATILE
+kconfig enable ARCH_MULTIPLATFORM
+kconfig disable ARCH_MULTI_V7
+kconfig enable ARCH_MULTI_V6
+# sub-architectures
+kconfig enable ARCH_BCM
+kconfig enable ARCH_BCM2835
+kconfig enable DRM
+kconfig enable DRM_VC4

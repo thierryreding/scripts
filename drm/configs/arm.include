@@ -1,21 +1,27 @@
+# architecture
 kconfig architecture arm
 kconfig allnoconfig
+# basic configuration
+kconfig enable DEBUG_FS
 kconfig enable DEBUG_SECTION_MISMATCH
 kconfig enable TICK_CPU_ACCOUNTING
 kconfig enable MMU
 kconfig enable PCI
 kconfig enable SPI
+kconfig enable SOUND
+kconfig enable SND
+# sub-architectures
+kconfig disable ARCH_VERSATILE
 kconfig enable ARCH_MULTIPLATFORM
 kconfig enable ARCH_EXYNOS
 kconfig enable ARCH_OMAP3
 kconfig enable ARCH_OMAP4
 kconfig enable ARCH_QCOM
-kconfig enable ARCH_ROCKCHIP
-kconfig enable ARCH_SHMOBILE_MULTI
+kconfig enable ARCH_RENESAS
 kconfig enable ARCH_R8A7790
 kconfig enable ARCH_R8A7791
+kconfig enable ARCH_ROCKCHIP
 kconfig enable ARCH_TEGRA
-kconfig enable DEBUG_FS
 kconfig enable EXYNOS_IOMMU
 kconfig enable ROCKCHIP_IOMMU
 kconfig enable OMAP2_DSS
@@ -56,6 +62,7 @@ kconfig enable DRM_RCAR_HDMI
 kconfig enable DRM_RCAR_LVDS
 kconfig enable DRM_ROCKCHIP
 kconfig enable ROCKCHIP_DW_HDMI
+kconfig enable DRM_DW_HDMI_AHB_AUDIO
 kconfig enable DRM_SHMOBILE
 kconfig enable DRM_STI
 kconfig enable DRM_STI_FBDEV
