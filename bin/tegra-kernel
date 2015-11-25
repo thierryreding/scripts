@@ -1,0 +1,192 @@
+#!/bin/sh
+
+topdir=$(cd ${0%/*}/.. && pwd)
+. $topdir/lib/cross-compile.sh
+
+JOBS=$(lscpu | awk '/^CPU\(s\):/ { print $2 }')
+KBUILD_OUTPUT=build
+SELF=$0
+ARGS=$@
+CMD=build
+pwd=`pwd`
+
+while test $# -gt 0; do
+	if test -n "$prev"; then
+		eval "$prev=$1"
+		shift; prev=
+		continue
+	fi
+
+	case $1 in
+		-o | --output)
+			prev=KBUILD_OUTPUT
+			shift
+			;;
+
+		-s | --soc)
+			prev=SOC
+			shift
+			;;
+
+		-j | --jobs)
+			prev=JOBS
+			shift
+			;;
+
+		*)
+			CMD=$1
+			shift
+			break
+			;;
+	esac
+done
+
+if test -z "$SOC"; then
+	rc=0
+
+	for SOC in tegra20 tegra30 tegra114 tegra124 tegra132 tegra210; do
+		$SELF --soc $SOC $ARGS || exit $?
+	done
+
+	exit 0
+fi
+
+case $SOC in
+	tegra20 | tegra30 | tegra114 | tegra124)
+		ARCH=arm
+		;;
+
+	tegra132 | tegra210)
+		ARCH=arm64
+		;;
+
+	*)
+		echo "unsupported SoC: $SOC"
+		exit 1
+		;;
+esac
+
+KBUILD_OUTPUT=${KBUILD_OUTPUT}/$SOC
+export KBUILD_OUTPUT
+export ARCH
+
+case $ARCH in
+	arm)
+		DEFCONFIG=tegra_defconfig
+		IMAGE=zImage
+		DTS=dts
+		;;
+
+	arm64)
+		DEFCONFIG=defconfig
+		IMAGE=Image
+		DTS=dts/nvidia
+		;;
+
+	*)
+		echo "unsupported architecture: $ARCH"
+		exit 1
+		;;
+esac
+
+function configure()
+{
+	if test ! -f "$KBUILD_OUTPUT/.config"; then
+		CONFIG="${1-$DEFCONFIG}"
+	else
+		CONFIG=oldconfig
+	fi
+
+	nice make -j $JOBS $CONFIG
+}
+
+function defconfig()
+{
+	nice make -j $JOBS $DEFCONFIG
+}
+
+function oldconfig()
+{
+	nice make -j $JOBS oldconfig
+}
+
+function menuconfig()
+{
+	nice make -j $JOBS menuconfig
+}
+
+function savedefconfig()
+{
+	nice make -j $JOBS savedefconfig
+}
+
+function build()
+{
+	local ARGS
+	check=no
+
+	while test $# -gt 0; do
+		case $1 in
+			-c | --check)
+				check=yes
+				shift
+				;;
+
+			*)
+				break
+				;;
+		esac
+	done
+
+	if test "x$check" = "xyes"; then
+		ARGS="C=1"
+	fi
+
+	nice make -j $JOBS $ARGS oldconfig
+	nice make -j $JOBS $ARGS 2>&1 | tee "$KBUILD_OUTPUT/build.log"
+}
+
+function clean()
+{
+	nice make -j $JOBS clean
+}
+
+function install()
+{
+	if test -z "$SOC"; then
+		echo "SoC not specified"
+		exit 1
+	fi
+
+	cp $KBUILD_OUTPUT/arch/$ARCH/boot/$IMAGE /srv/nfs/$SOC/boot
+	cp $KBUILD_OUTPUT/arch/$ARCH/boot/$DTS/$SOC-*.dtb /srv/nfs/$SOC/boot
+
+	nice make -j $JOBS INSTALL_MOD_PATH=/srv/nfs/$SOC modules_install
+
+	case $SOC in
+		# Cardhu support exists for two different revisions, so create
+		# a symlink to the correct one.
+		tegra30)
+			ln -sf tegra30-cardhu-a04.dtb /srv/nfs/$SOC/boot/tegra30-cardhu.dtb
+			;;
+
+		# Tegra210 doesn't support network booting yet, so it must be
+		# copied onto MMC/SD as well. This assumes that U-Boot UMS is
+		# used and creates a local device named /dev/sde whose first
+		# partition is the root partition.
+		tegra210)
+			mount /dev/sdc1 /mnt &&
+				cp $KBUILD_OUTPUT/arch/$ARCH/boot/$DTS/$SOC-*.dtb /mnt/$SOC/boot &&
+				cp $KBUILD_OUTPUT/arch/$ARCH/boot/$IMAGE /mnt/$SOC/boot &&
+				umount /mnt
+			;;
+	esac
+}
+
+if test "$(type -t $CMD 2> /dev/null)" = 'function'; then
+	cross_compile_prepare $ARCH
+	$CMD "$@"
+	cross_compile_cleanup
+else
+	echo "$CMD: no such command"
+fi

@@ -1,17 +1,22 @@
 prefix ?= ${HOME}
+libdir = $(prefix)/lib
 bindir = $(prefix)/bin
 
 all:
 
 install-targets = \
-	$(bindir)/kernel-build \
+	$(libdir)/cross-compile.sh \
+	$(bindir)/tegra-kernel \
 	$(bindir)/uboot-build \
 	$(bindir)/rr-cache
 
-$(bindir):
+$(libdir) $(bindir):
 	mkdir -p $@
 
-$(bindir)/%: % | $(bindir)
+$(libdir)/%: lib/% | $(libdir)
+	ln -s $(abspath $<) $@
+
+$(bindir)/%: bin/% | $(bindir)
 	ln -s $(abspath $<) $@
 
 install: $(install-targets)

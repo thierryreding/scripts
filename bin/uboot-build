@@ -1,5 +1,8 @@
 #!/bin/sh
 
+topdir=$(cd ${0%/*}/.. && pwd)
+. $topdir/lib/cross-compile.sh
+
 ARCH=
 SOC=
 BOARDS=
@@ -83,36 +86,42 @@ if test -n "$FILTER"; then
 	FILTER="($FILTER)"
 fi
 
-awk "/^#/ || /^$/ { next }; $FILTER { print \$4\" \"\$5\" \"\$7 }" boards.cfg |
-	while read soc vendor board; do
-		builddir="build/${soc}/${board}"
+awk "/^#/ || /^$/ { next }; $FILTER { print \$2\" \"\$4\" \"\$5\" \"\$7 }" boards.cfg |
+	while read arch soc vendor board; do
+		KBUILD_OUTPUT="build/${soc}/${board}"
+		export KBUILD_OUTPUT
 
-		if test -d "$builddir"; then
+		if test -d "$KBUILD_OUTPUT"; then
 			if test "x$incremental" = "xno"; then
-				rm -rf "$builddir"
+				rm -rf "$KBUILD_OUTPUT"
 			fi
 		fi
 
-		if ! test -d "$builddir"; then
-			mkdir -p "$builddir"
+		if ! test -d "$KBUILD_OUTPUT"; then
+			mkdir -p "$KBUILD_OUTPUT"
 			incremental=no
 		fi
+
+		if ! test -f "$KBUILD_OUTPUT/.config"; then
+			incremental=no
+		fi
+
+		cross_compile_prepare $arch
 
 		echo -en "building \033[35m${soc}\033[0m/\033[33m${board}\033[0m..."
 
 		if test "x$incremental" = "xno"; then
-			make CROSS_COMPILE=${CROSS_COMPILE} O="$builddir" "${board}_defconfig" -j$JOBS > "$builddir/config.log" 2>&1
+			make "${board}_defconfig" -j$JOBS > "$KBUILD_OUTPUT/config.log" 2>&1
 		fi
 
 		(
 			# redirect stdout to stderr and stderr to stdout so
 			# that tee can write stderr to error.log (tee reads
 			# only stdout via the pipe)
-			make CROSS_COMPILE=${CROSS_COMPILE} O="$builddir" -j$JOBS \
-				3>&1 1>&2 2>&3 | tee "$builddir/error.log"
+			make -j$JOBS 3>&1 1>&2 2>&3 | tee "$KBUILD_OUTPUT/error.log"
 			# need $PIPESTATUS here because $? contains tee's exit code
 			exit $PIPESTATUS
-		) &> "$builddir/build.log"
+		) &> "$KBUILD_OUTPUT/build.log"
 		rc=$?
 
 		if test "x$rc" != "x0"; then
@@ -120,7 +129,7 @@ awk "/^#/ || /^$/ { next }; $FILTER { print \$4\" \"\$5\" \"\$7 }" boards.cfg |
 			rc=77
 			break
 		else
-			if test -s "$builddir/error.log"; then
+			if test -s "$KBUILD_OUTPUT/error.log"; then
 				echo -e "\033[1;33mdone ($rc)\033[0m"
 
 				if test "x$strict" = "xyes"; then
@@ -131,6 +140,8 @@ awk "/^#/ || /^$/ { next }; $FILTER { print \$4\" \"\$5\" \"\$7 }" boards.cfg |
 				echo -e "\033[1;32mdone\033[0m"
 			fi
 		fi
+
+		cross_compile_cleanup
 	done
 
 exit $rc
