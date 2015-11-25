@@ -5,6 +5,7 @@ configdir="${basedir}/configs"
 outputdir="build/drm"
 
 verbose=no
+check=no
 color=no
 force=no
 JOBS=1
@@ -15,6 +16,7 @@ function usage()
 	echo ""
 	echo "options:"
 	echo "  -c, --color    colorize output"
+	echo "  -C, --check    run static checker while building"
 	echo "  -f, --force    force build from scratch"
 	echo "  -h, --help     display help screen and exit"
 	echo "  -j, --jobs N   set number of parallel make jobs"
@@ -31,6 +33,11 @@ while test $# -ne 0; do
 	case $1 in
 		-c | --color)
 			color=yes
+			shift
+			;;
+
+		-C | --check)
+			check=yes
 			shift
 			;;
 
@@ -163,7 +170,13 @@ function kconfig()
 
 function kbuild()
 {
-	make ARCH=$ARCH CROSS_COMPILE=$CROSS_COMPILE O=$KBUILD_OUTPUT -j $JOBS
+	ARGS="ARCH=$ARCH CROSS_COMPILE=$CROSS_COMPILE O=$KBUILD_OUTPUT"
+
+	if test "x$check" = "xyes"; then
+		ARGS="$ARGS C=1"
+	fi
+
+	make $ARGS -j $JOBS
 }
 
 if test -z "$configs"; then
