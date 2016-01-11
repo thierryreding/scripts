@@ -16,6 +16,7 @@ kconfig enable DRM_LOAD_EDID_FIRMWARE
 kconfig enable DRM_AMDGPU
 kconfig enable DRM_AMDGPU_CIK
 kconfig enable DRM_AMDGPU_USERPTR
+kconfig enable DRM_AMD_POWERPLAY
 kconfig enable DRM_AST
 kconfig enable DRM_BOCHS
 kconfig enable DRM_CIRRUS_QEMU
