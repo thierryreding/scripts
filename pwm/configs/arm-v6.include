@@ -11,8 +11,11 @@ kconfig enable ARCH_MULTI_V6
 # for PWM_BCM2835
 kconfig enable ARCH_BCM
 kconfig enable ARCH_BCM2835
+# for PWM_OMAP_DMTIMER
+kconfig enable ARCH_OMAP2
 # PWM drivers
 kconfig enable PWM
 kconfig enable PWM_BCM2835
+kconfig enable PWM_OMAP_DMTIMER
 # PWM users
 include users.include
