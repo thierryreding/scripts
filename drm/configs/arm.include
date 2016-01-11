@@ -14,6 +14,7 @@ kconfig enable SND
 kconfig disable ARM_SINGLE_ARMV7M
 kconfig enable ARCH_MULTIPLATFORM
 kconfig enable ARCH_EXYNOS
+kconfig enable ARCH_MXC
 kconfig enable ARCH_OMAP3
 kconfig enable ARCH_OMAP4
 kconfig enable ARCH_QCOM
@@ -30,8 +31,12 @@ kconfig enable IMX_IPUV3_CORE
 kconfig enable STAGING
 kconfig enable DRM_LOAD_EDID_FIRMWARE
 kconfig enable DRM
+kconfig enable DRM_ARM
+kconfig enable DRM_HDLCD
+kconfig enable DRM_HDLCD_SHOW_UNDERRUN
 kconfig enable DRM_ARMADA
 kconfig enable DRM_ATMEL_HLCDC
+kconfig enable DRM_ETNAVIV
 kconfig enable DRM_EXYNOS
 kconfig enable DRM_EXYNOS_FIMD
 kconfig enable DRM_EXYNOS5433_DECON
