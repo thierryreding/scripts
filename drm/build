@@ -176,7 +176,7 @@ function kbuild()
 		ARGS="$ARGS C=1"
 	fi
 
-	make $ARGS -j $JOBS
+	make $ARGS -j $JOBS -k
 }
 
 if test -z "$configs"; then
