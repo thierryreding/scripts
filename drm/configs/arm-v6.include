@@ -1,10 +1,13 @@
+# architecture
 kconfig architecture arm
 kconfig allnoconfig
+# basic configuration
 kconfig enable DEBUG_FS
 kconfig enable DEBUG_SECTION_MISMATCH
 kconfig enable TICK_CPU_ACCOUNTING
 kconfig enable MMU
-kconfig disable ARCH_VERSATILE
+# sub-architectures
+kconfig disable ARM_SINGLE_ARMV7M
 kconfig enable ARCH_MULTIPLATFORM
 kconfig disable ARCH_MULTI_V7
 kconfig enable ARCH_MULTI_V6

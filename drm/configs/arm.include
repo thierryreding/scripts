@@ -11,7 +11,7 @@ kconfig enable SPI
 kconfig enable SOUND
 kconfig enable SND
 # sub-architectures
-kconfig disable ARCH_VERSATILE
+kconfig disable ARM_SINGLE_ARMV7M
 kconfig enable ARCH_MULTIPLATFORM
 kconfig enable ARCH_EXYNOS
 kconfig enable ARCH_OMAP3
