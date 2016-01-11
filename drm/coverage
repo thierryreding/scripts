@@ -2,7 +2,7 @@
 
 basedir="${0%/*}"
 configdir="${basedir}/configs"
-outputdir="build/drm"
+outputdir="build/$(git describe)/drm"
 
 function usage()
 {
