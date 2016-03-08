@@ -1,6 +1,10 @@
 #!/bin/bash
 
-basedir="${0%/*}"
+basedir=$(cd ${0%/*} && pwd)
+topdir=$(cd ${0%/*}/.. && pwd)
+
+. $topdir/lib/cross-compile.sh
+
 configdir="${basedir}/configs"
 outputdir="build/$(git describe)/drm"
 
@@ -81,50 +85,6 @@ if test "x$color" = "xyes"; then
 	CYAN="\033[0;36m"
 	RESET="\033[0m"
 fi
-
-function cross_compile_prepare()
-{
-	local path key value
-
-	ARCH=$1
-
-	if test -f "$HOME/.cross-compile"; then
-		while read key value; do
-			key="${key%:}"
-
-			if test "$key" = "path"; then
-				eval "value=$value"
-
-				if test -n "$path"; then
-					path="$path:$value"
-				else
-					path="$value"
-				fi
-			elif test "$key" = "$ARCH"; then
-				CROSS_COMPILE="$value"
-			fi
-		done < "$HOME/.cross-compile"
-	fi
-
-	if test -n "$path"; then
-		saved_PATH="$PATH"
-		PATH="$path:$PATH"
-	fi
-
-	if test "x$verbose" = "xyes"; then
-		echo "CROSS_COMPILE: $CROSS_COMPILE"
-		echo "PATH: $PATH"
-	fi
-}
-
-function cross_compile_cleanup()
-{
-	if test -n "$saved_PATH"; then
-		PATH="$saved_PATH"
-	fi
-
-	unset CROSS_COMPILE
-}
 
 function make()
 {
