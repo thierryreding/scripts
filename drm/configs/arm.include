@@ -10,6 +10,15 @@ kconfig enable PCI
 kconfig enable SPI
 kconfig enable SOUND
 kconfig enable SND
+# for DRM_RCAR_VSP
+kconfig enable MEDIA_SUPPORT
+kconfig enable MEDIA_CAMERA_SUPPORT
+kconfig enable MEDIA_CONTROLLER
+kconfig enable V4L_MEM2MEM_DRIVERS
+kconfig enable VIDEO_DEV
+kconfig enable VIDEO_V4L2
+kconfig enable VIDEO_V4L2_SUBDEV_API
+kconfig enable VIDEO_RENESAS_VSP1
 # sub-architectures
 kconfig disable ARM_SINGLE_ARMV7M
 kconfig enable ARCH_MULTIPLATFORM
@@ -31,6 +40,7 @@ kconfig enable IMX_IPUV3_CORE
 kconfig enable STAGING
 kconfig enable DRM_LOAD_EDID_FIRMWARE
 kconfig enable DRM
+kconfig enable DRM_DP_AUX_CHARDEV
 kconfig enable DRM_ARM
 kconfig enable DRM_HDLCD
 kconfig enable DRM_HDLCD_SHOW_UNDERRUN
@@ -83,9 +93,11 @@ kconfig enable DISPLAY_PANEL_TPO_TD028TTEC1
 kconfig enable DRM_RCAR_DU
 kconfig enable DRM_RCAR_HDMI
 kconfig enable DRM_RCAR_LVDS
+kconfig enable DRM_RCAR_VSP
 kconfig enable DRM_ROCKCHIP
 kconfig enable ROCKCHIP_DW_HDMI
 kconfig enable ROCKCHIP_DW_MIPI_DSI
+kconfig enable ROCKCHIP_INNO_HDMI
 kconfig enable DRM_DW_HDMI_AHB_AUDIO
 kconfig enable DRM_SHMOBILE
 kconfig enable DRM_STI

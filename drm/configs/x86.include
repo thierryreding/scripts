@@ -9,14 +9,17 @@ kconfig enable X86_INTEL_MID
 kconfig enable DEBUG_FS
 kconfig enable PCI
 kconfig enable AGP
+kconfig enable AGP_INTEL
 kconfig enable USB_SUPPORT
 kconfig enable VIRTIO_MMIO
 kconfig enable VGA_SWITCHEROO
 kconfig enable DRM
+kconfig enable DRM_DP_AUX_CHARDEV
 kconfig enable DRM_LOAD_EDID_FIRMWARE
 kconfig enable DRM_AMDGPU
 kconfig enable DRM_AMDGPU_CIK
 kconfig enable DRM_AMDGPU_USERPTR
+kconfig enable DRM_AMD_ACP
 kconfig enable DRM_AMD_POWERPLAY
 kconfig enable DRM_AST
 kconfig enable DRM_BOCHS

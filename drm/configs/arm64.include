@@ -12,6 +12,7 @@ kconfig enable TEGRA_HOST1X
 kconfig enable TEGRA_HOST1X_FIREWALL
 # DRM
 kconfig enable DRM
+kconfig enable DRM_DP_AUX_CHARDEV
 kconfig enable DRM_TEGRA
 # panel drivers
 kconfig enable DRM_PANEL_SIMPLE
