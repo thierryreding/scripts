@@ -1,6 +1,7 @@
 kconfig architecture x86
 kconfig allnoconfig
 kconfig enable DEBUG_SECTION_MISMATCH
+kconfig enable SECTION_MISMATCH_WARN_ONLY
 kconfig enable X86_EXTENDED_PLATFORM
 kconfig enable X86_PLATFORM_DEVICES
 kconfig enable X86_UP_APIC
