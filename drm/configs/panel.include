@@ -3,7 +3,7 @@ kconfig architecture arm
 kconfig allnoconfig
 kconfig enable MMU
 # sub-architectures
-kconfig disable ARCH_VERSATILE
+kconfig disable ARCH_SINGLE_ARMV7M
 kconfig enable ARCH_MULTIPLATFORM
 kconfig enable ARCH_TEGRA
 # dependencies
