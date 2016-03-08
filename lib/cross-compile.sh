@@ -29,8 +29,8 @@ function cross_compile_prepare()
 					saved_CROSS_COMPILE="$CROSS_COMPILE"
 				fi
 
-				CROSS_COMPILE="$value"
-				export CROSS_COMPILE
+				ARCH=$arch; CROSS_COMPILE="$value"
+				export ARCH CROSS_COMPILE
 			fi
 		done < "$HOME/.cross-compile"
 	fi
