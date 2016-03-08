@@ -85,6 +85,7 @@ kconfig enable DRM_RCAR_HDMI
 kconfig enable DRM_RCAR_LVDS
 kconfig enable DRM_ROCKCHIP
 kconfig enable ROCKCHIP_DW_HDMI
+kconfig enable ROCKCHIP_DW_MIPI_DSI
 kconfig enable DRM_DW_HDMI_AHB_AUDIO
 kconfig enable DRM_SHMOBILE
 kconfig enable DRM_STI
