@@ -19,12 +19,13 @@ function usage()
 	echo "usage: $1 [options] [config...]"
 	echo ""
 	echo "options:"
-	echo "  -c, --color    colorize output"
-	echo "  -C, --check    run static checker while building"
-	echo "  -f, --force    force build from scratch"
-	echo "  -h, --help     display help screen and exit"
-	echo "  -j, --jobs N   set number of parallel make jobs"
-	echo "  -v, --verbose  increase verbosity"
+	echo "  -c, --color       colorize output"
+	echo "  -C, --check       run static checker while building"
+	echo "  -f, --force       force build from scratch"
+	echo "  -h, --help        display help screen and exit"
+	echo "  -j, --jobs N      set number of parallel make jobs"
+	echo "  -o, --output DIR  set output directory"
+	echo "  -v, --verbose     increase verbosity"
 }
 
 while test $# -ne 0; do
@@ -57,6 +58,11 @@ while test $# -ne 0; do
 
 		-j | --jobs)
 			prev=JOBS
+			shift
+			;;
+
+		-o | --output)
+			prev=outputdir
 			shift
 			;;
 
