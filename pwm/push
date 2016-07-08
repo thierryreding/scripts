@@ -1,0 +1,56 @@
+#!/bin/sh
+
+topdir="${0%/*}"
+
+. "$topdir/lib.sh"
+
+opt_dry_run=no
+opt_branches=yes
+opt_tags=no
+
+usage()
+{
+	echo "usage: $0 [options]"
+	echo ""
+	echo "options:"
+	echo "  -n, --dry-run    pretend to push"
+}
+
+while test $# -gt 0; do
+	case $1 in
+		-n | --dry-run)
+			opt_dry_run=yes
+			shift
+			;;
+
+		*)
+			usage $0
+			exit 1
+			;;
+	esac
+done
+
+remote=$(get_remote)
+args="--force"
+base=
+
+if test "x$opt_dry_run" = "xyes"; then
+	args="$args --dry-run"
+fi
+
+while read branch; do
+	if test -z "$base"; then
+		base=$branch
+		continue
+	fi
+
+	if test "x$opt_branches" = "xyes"; then
+		refspecs="${refspecs} ${branch}:${branch}"
+	fi
+done < "$topdir/branches"
+
+if test "x$opt_branches" = "xyes"; then
+	refspecs="${refspecs} for-next:for-next"
+fi
+
+git push ${args} ${remote} ${refspecs}

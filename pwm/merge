@@ -1,0 +1,20 @@
+#!/bin/sh
+
+topdir="${0%/*}"
+base=
+
+while read branch; do
+	if test -z "$base"; then
+		base=$branch
+
+		if ! git checkout for-next; then
+			git checkout -b for-next $base
+		else
+			git reset --hard $base
+		fi
+
+		continue
+	fi
+
+	git merge --no-ff $branch
+done < "$topdir/branches"
