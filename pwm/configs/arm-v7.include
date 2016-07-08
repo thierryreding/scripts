@@ -28,6 +28,10 @@ kconfig enable ARCH_BCM
 kconfig enable ARCH_BCM_281XX
 # for PWM_BRCMSTB
 kconfig enable ARCH_BRCMSTB
+# for PWM_BCM_IPROC
+kconfig enable ARCH_BCM_CYGNUS
+kconfig enable ARCH_BCM_NSP
+kconfig enable ARCH_BCM_5301X
 # for PWM_BERLIN
 kconfig enable ARCH_BERLIN
 # for PWM_IMX
@@ -72,6 +76,7 @@ kconfig enable PWM_AB8500
 kconfig enable PWM_ATMEL
 kconfig enable PWM_ATMEL_HLCDC_PWM
 kconfig enable PWM_ATMEL_TCB
+kconfig enable PWM_BCM_IPROC
 kconfig enable PWM_BCM_KONA
 kconfig enable PWM_BRCMSTB
 kconfig enable PWM_BERLIN
