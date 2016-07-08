@@ -3,8 +3,28 @@
 set -e
 set -x
 
+while test $# -gt 0; do
+	case $1 in
+		--cc)
+			if test -n "$cc_extra"; then
+				cc_extra="$cc_extra, $2"
+			else
+				cc_extra="$2"
+			fi
+			shift 2
+			;;
+
+		*)
+			break
+			;;
+	esac
+done
+
 if test -z "$1" -o -z "$2"; then
-	echo "usage: $0 BASE TAG"
+	echo "usage: $0 [options] BASE TAG"
+	echo ""
+	echo "options:"
+	echo "  --cc RECIPIENT   add recipient to the Cc list"
 	exit 1
 fi
 
@@ -17,6 +37,13 @@ remote=pwm
 to="Linus Torvalds <torvalds@linux-foundation.org>"
 cc="linux-pwm@vger.kernel.org"
 cc="$cc, linux-kernel@vger.kernel.org"
+
+if test -n "$cc_extra"; then
+	cc="$cc, $cc_extra"
+fi
+
+echo "To: $to"
+echo "Cc: $cc"
 
 message="pull-request/$tag"
 name=$(git config --get user.name)
