@@ -7,7 +7,7 @@ kconfig enable SYSFS
 # bus configuration
 kconfig enable I2C
 # architecture configuration
-kconfig disable ARCH_VERSATILE
+kconfig disable ARM_SINGLE_ARMV7M
 kconfig enable ARCH_MULTIPLATFORM
 kconfig enable ARCH_MULTI_V7
 # for PM_AB8500
@@ -37,7 +37,7 @@ kconfig enable MFD_LP3943
 # for PWM_MTK_DISP
 kconfig enable ARCH_MEDIATEK
 # for PWM_RCAR
-kconfig enable ARCH_SHMOBILE_MULTI
+kconfig enable ARCH_RENESAS
 kconfig enable ARCH_R8A7778
 kconfig enable ARCH_R8A7779
 kconfig enable ARCH_R8A7790
@@ -45,7 +45,7 @@ kconfig enable ARCH_R8A7791
 kconfig enable ARCH_R8A7793
 kconfig enable ARCH_R8A7794
 # for PWM_RENESAS_TPU
-kconfig enable ARCH_SHMOBILE_MULTI
+kconfig enable ARCH_RENESAS
 # for PWM_ROCKCHIP
 kconfig enable ARCH_ROCKCHIP
 # for PWM_SAMSUNG
