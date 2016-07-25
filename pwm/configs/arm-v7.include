@@ -34,6 +34,8 @@ kconfig enable ARCH_BCM_NSP
 kconfig enable ARCH_BCM_5301X
 # for PWM_BERLIN
 kconfig enable ARCH_BERLIN
+# for PWM_CROS_EC
+kconfig enable MFD_CROS_EC
 # for PWM_IMX
 kconfig enable ARCH_MXC
 # for PWM_LP3943
@@ -58,6 +60,8 @@ kconfig enable ARCH_EXYNOS
 kconfig enable PLAT_SPEAR
 # for PWM_STI
 kconfig enable ARCH_STI
+# for PWM_STMPE
+kconfig enable MFD_STMPE
 # for PWM_SUN4I
 kconfig enable ARCH_SUNXI
 # for PWM_TEGRA
@@ -80,6 +84,7 @@ kconfig enable PWM_BCM_IPROC
 kconfig enable PWM_BCM_KONA
 kconfig enable PWM_BRCMSTB
 kconfig enable PWM_BERLIN
+kconfig enable PWM_CROS_EC
 kconfig enable PWM_FSL_FTM
 kconfig enable PWM_IMX
 kconfig enable PWM_LP3943
@@ -91,6 +96,7 @@ kconfig enable PWM_ROCKCHIP
 kconfig enable PWM_SAMSUNG
 kconfig enable PWM_SPEAR
 kconfig enable PWM_STI
+kconfig enable PWM_STMPE
 kconfig enable PWM_SUN4I
 kconfig enable PWM_TEGRA
 kconfig enable PWM_TIECAP
