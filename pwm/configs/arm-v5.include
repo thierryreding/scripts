@@ -6,7 +6,7 @@ kconfig enable MMU
 kconfig enable SYSFS
 kconfig enable I2C
 # architecture configuration
-kconfig disable ARCH_VERSATILE
+kconfig disable ARM_SINGLE_ARMV7M
 kconfig enable ARCH_MULTIPLATFORM
 kconfig disable ARCH_MULTI_V7
 kconfig enable ARCH_MULTI_V5

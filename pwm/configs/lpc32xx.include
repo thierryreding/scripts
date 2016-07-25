@@ -5,7 +5,7 @@ kconfig enable DEBUG_FS
 kconfig enable MMU
 kconfig enable SYSFS
 # architecture configuration
-kconfig disable ARCH_VERSATILE
+kconfig disable ARM_SINGLE_ARMV7M
 kconfig enable ARCH_LPC32XX
 # PWM drivers
 kconfig enable PWM

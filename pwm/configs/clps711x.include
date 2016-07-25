@@ -5,6 +5,7 @@ kconfig enable DEBUG_FS
 kconfig enable MMU
 kconfig enable SYSFS
 # architecture configuration
+kconfig disable ARM_SINGLE_ARMV7M
 kconfig disable ARCH_VERSATILE
 kconfig enable ARCH_CLPS711X
 kconfig enable ARCH_AUTCPU12

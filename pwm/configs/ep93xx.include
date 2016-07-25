@@ -5,7 +5,7 @@ kconfig enable DEBUG_FS
 kconfig enable MMU
 kconfig enable SYSFS
 # architecture configuration
-kconfig disable ARCH_VERSATILE
+kconfig disable ARM_SINGLE_ARMV7M
 kconfig enable ARCH_EP93XX
 kconfig enable MACH_ADSSPHERE
 kconfig enable MACH_EDB9301
