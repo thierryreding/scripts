@@ -1,6 +1,4 @@
-v4.7-rc1
-fixes
-for-4.8/core
-for-4.8/capture
-for-4.8/drivers
-for-4.8/regulator
+v4.9-rc1
+for-4.9/fixes
+for-4.10/core
+for-4.10/drivers
