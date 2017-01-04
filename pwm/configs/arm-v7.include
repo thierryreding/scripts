@@ -36,10 +36,14 @@ kconfig enable ARCH_BCM_5301X
 kconfig enable ARCH_BERLIN
 # for PWM_CROS_EC
 kconfig enable MFD_CROS_EC
+# for PWM_HIBVT
+kconfig enable ARCH_HISI
 # for PWM_IMX
 kconfig enable ARCH_MXC
 # for PWM_LP3943
 kconfig enable MFD_LP3943
+# for PWM_MESON
+kconfig enable ARCH_MESON
 # for PWM_MTK_DISP
 kconfig enable ARCH_MEDIATEK
 # for PWM_RCAR
@@ -86,8 +90,10 @@ kconfig enable PWM_BRCMSTB
 kconfig enable PWM_BERLIN
 kconfig enable PWM_CROS_EC
 kconfig enable PWM_FSL_FTM
+kconfig enable PWM_HIBVT
 kconfig enable PWM_IMX
 kconfig enable PWM_LP3943
+kconfig enable PWM_MESON
 kconfig enable PWM_MTK_DISP
 kconfig enable PWM_PCA9685
 kconfig enable PWM_RCAR
