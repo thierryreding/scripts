@@ -9,15 +9,27 @@ function usage()
 	echo "usage: $0 [options] [config...]"
 	echo ""
 	echo "options:"
-	echo "  -h, --help     display help screen and exit"
-	echo "  -v, --verbose  increase verbosity"
+	echo "  -h, --help        display help screen and exit"
+	echo "  -o, --output DIR  set output directory"
+	echo "  -v, --verbose     increase verbosity"
 }
 
 while test $# -ne 0; do
+	if test -n "$prev"; then
+		eval "$prev=$1"
+		shift; prev=
+		continue
+	fi
+
 	case $1 in
 		-h | --help)
 			usage $0
 			exit 0
+			;;
+
+		-o | --output)
+			prev=outputdir
+			shift
 			;;
 
 		-v | --verbose)
