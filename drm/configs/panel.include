@@ -3,22 +3,42 @@ kconfig architecture arm
 kconfig allnoconfig
 kconfig enable MMU
 # sub-architectures
-kconfig disable ARCH_SINGLE_ARMV7M
-kconfig enable ARCH_MULTIPLATFORM
+kconfig enable ARCH_ROCKCHIP
 kconfig enable ARCH_TEGRA
 # dependencies
 kconfig enable BACKLIGHT_LCD_SUPPORT
 kconfig enable LCD_CLASS_DEVICE
 kconfig enable BACKLIGHT_CLASS_DEVICE
+kconfig enable SOUND
+kconfig enable SND
+kconfig enable SND_SOC
 kconfig enable SPI
+kconfig enable ROCKCHIP_IOMMU
 # DRM infrastructure
 kconfig enable DRM
+kconfig enable DRM_ROCKCHIP
+kconfig enable ROCKCHIP_DW_HDMI
 kconfig enable DRM_TEGRA
 # DRM panel drivers
 kconfig enable DRM_PANEL_SIMPLE
+kconfig enable DRM_PANEL_JDI_LT070ME05000
 kconfig enable DRM_PANEL_LG_LG4573
 kconfig enable DRM_PANEL_PANASONIC_VVX10F034N00
 kconfig enable DRM_PANEL_SAMSUNG_LD9040
 kconfig enable DRM_PANEL_SAMSUNG_S6E8AA0
 kconfig enable DRM_PANEL_SHARP_LQ101R1SX01
 kconfig enable DRM_PANEL_SHARP_LS043T1LE01
+kconfig enable DRM_PANEL_SITRONIX_ST7789V
+# DRM bridge drivers
+kconfig enable DRM_ANALOGIX_ANX78XX
+kconfig enable DRM_DUMB_VGA_DAC
+kconfig enable DRM_DW_HDMI_AHB_AUDIO
+kconfig enable DRM_DW_HDMI_I2S_AUDIO
+kconfig enable DRM_LVDS_ENCODER
+kconfig enable DRM_MEGACHIPS_STDPXXXX_GE_B850V3_FW
+kconfig enable DRM_NXP_PTN3460
+kconfig enable DRM_PARADE_PS8622
+kconfig enable DRM_SIL_SII8620
+kconfig enable DRM_SII902X
+kconfig enable DRM_TOSHIBA_TC358767
+kconfig enable DRM_TI_TFP410

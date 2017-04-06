@@ -17,6 +17,7 @@ kconfig enable DRM_DP_AUX_CHARDEV
 kconfig enable DRM_LOAD_EDID_FIRMWARE
 kconfig enable DRM_AMDGPU
 kconfig enable DRM_AMDGPU_CIK
+kconfig enable DRM_AMDGPU_SI
 kconfig enable DRM_AMDGPU_USERPTR
 kconfig enable DRM_AMD_ACP
 kconfig enable DRM_AMD_POWERPLAY
@@ -47,6 +48,7 @@ kconfig enable DRM_VIRTIO_GPU
 kconfig enable DRM_VMWGFX
 kconfig enable DRM_VMWGFX_FBCON
 kconfig enable DRM_I2C_ADV7511
+kconfig enable DRM_I2C_ADV7511_AUDIO
 kconfig enable DRM_I2C_NXP_TDA998X
 kconfig enable IOMMU_SUPPORT
 kconfig enable AMD_IOMMU

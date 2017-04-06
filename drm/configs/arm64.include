@@ -4,8 +4,12 @@ kconfig allnoconfig
 # basic configuration
 kconfig enable DEBUG_FS
 kconfig enable DEBUG_SECTION_MISMATCH
+kconfig enable PCI
 # sub-architectures
 kconfig enable ARCH_TEGRA
+kconfig enable ARCH_MEDIATEK
+kconfig enable ARCH_MESON
+kconfig enable ARCH_ZX
 # dependencies
 kconfig enable BACKLIGHT_LCD_SUPPORT
 kconfig enable TEGRA_HOST1X
@@ -13,9 +17,12 @@ kconfig enable TEGRA_HOST1X_FIREWALL
 # DRM
 kconfig enable DRM
 kconfig enable DRM_DP_AUX_CHARDEV
+kconfig enable DRM_HISI_HIBMC
+kconfig enable DRM_HISI_KIRIN
+kconfig enable HISI_KIRIN_DW_DSI
+kconfig enable DRM_MEDIATEK
+kconfig enable DRM_MESON
 kconfig enable DRM_TEGRA
+kconfig enable DRM_ZTE
 # panel drivers
 kconfig enable DRM_PANEL_SIMPLE
-# miscellaneous
-kconfig enable COMPILE_TEST
-kconfig enable DRM_VC4

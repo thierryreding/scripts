@@ -14,5 +14,9 @@ kconfig enable ARCH_MULTI_V6
 # sub-architectures
 kconfig enable ARCH_BCM
 kconfig enable ARCH_BCM2835
+# for DRM_VC4
+kconfig enable SOUND
+kconfig enable SND
+kconfig enable SND_SOC
 kconfig enable DRM
 kconfig enable DRM_VC4
