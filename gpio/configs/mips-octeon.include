@@ -1,0 +1,9 @@
+kconfig architecture mips
+kconfig allnoconfig
+# platform configuration
+kconfig disable SGI_IP22
+kconfig enable MTD
+kconfig enable CAVIUM_OCTEON_SOC
+# GPIO drivers
+kconfig enable GPIOLIB
+kconfig enable GPIO_STP_XWAY

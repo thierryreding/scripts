@@ -1,0 +1,15 @@
+kconfig architecture mips
+kconfig allnoconfig
+# basic configuration
+kconfig enable DEBUG_FS
+kconfig enable SYSFS
+# platform configuration
+kconfig disable SGI_IP22
+kconfig enable MACH_LOONGSON64
+kconfig disable CPU_R4X00
+kconfig enable CPU_LOONGSON3
+kconfig disable 32BIT
+kconfig enable 64BIT
+# GPIO drivers
+kconfig enable GPIOLIB
+kconfig enable GPIO_LOONGSON

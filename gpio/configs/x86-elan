@@ -1,0 +1,3 @@
+include x86-elan.include
+kconfig olddefconfig
+kbuild

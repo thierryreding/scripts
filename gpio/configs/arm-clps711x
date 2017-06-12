@@ -1,0 +1,3 @@
+include arm-clps711x.include
+kconfig olddefconfig
+kbuild

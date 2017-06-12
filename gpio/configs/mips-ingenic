@@ -1,0 +1,3 @@
+include mips-ingenic.include
+kconfig olddefconfig
+kbuild

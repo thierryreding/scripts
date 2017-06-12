@@ -1,0 +1,19 @@
+kconfig architecture arm64
+kconfig allnoconfig
+# basic configuration
+kconfig enable DEBUG_FS
+kconfig enable SYSFS
+# platform configuration
+kconfig enable ARCH_THUNDER2
+kconfig enable ARCH_XGENE
+# GPIO drivers
+kconfig enable GPIOLIB
+kconfig enable GPIO_MOCKUP
+kconfig enable GPIO_XGENE
+kconfig enable GPIO_XGENE_SB
+kconfig enable GPIO_XLP
+# busses
+include i2c.include
+include mfd.include
+include spi.include
+include usb.include

@@ -1,0 +1,8 @@
+kconfig architecture mips
+kconfig allnoconfig
+# platform configuration
+kconfig disable SGI_IP22
+kconfig enable MACH_VR41XX
+# GPIO drivers
+kconfig enable GPIOLIB
+kconfig enable GPIO_VR41XX

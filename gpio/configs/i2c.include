@@ -1,0 +1,14 @@
+kconfig enable I2C
+kconfig enable GPIO_ADNP
+kconfig enable GPIO_ADP5588
+kconfig enable GPIO_ADP5588_IRQ
+kconfig enable GPIO_MAX7300
+kconfig enable GPIO_MAX732X
+kconfig enable GPIO_MAX732X_IRQ
+kconfig enable GPIO_PCA953X
+kconfig enable GPIO_PCA953X_IRQ
+kconfig enable GPIO_PCF857X
+kconfig enable GPIO_SX150X
+kconfig enable GPIO_TPIC2810
+kconfig enable SOC_IMX6Q
+kconfig enable GPIO_TS4900

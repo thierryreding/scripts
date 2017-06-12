@@ -1,0 +1,3 @@
+include mips-ath79.include
+kconfig olddefconfig
+kbuild

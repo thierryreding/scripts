@@ -1,0 +1,3 @@
+include mips-octeon.include
+kconfig olddefconfig
+kbuild

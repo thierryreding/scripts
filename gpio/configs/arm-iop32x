@@ -1,0 +1,3 @@
+include arm-iop32x.include
+kconfig olddefconfig
+kbuild

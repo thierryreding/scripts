@@ -1,0 +1,6 @@
+kconfig enable SPI
+kconfig enable GPIO_74X164
+kconfig enable GPIO_MAX7301
+kconfig enable GPIO_MC33880
+kconfig enable GPIO_PISOSR
+kconfig enable GPIO_XRA1403

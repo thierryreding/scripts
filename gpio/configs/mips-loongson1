@@ -1,0 +1,3 @@
+include mips-loongson1.include
+kconfig olddefconfig
+kbuild

@@ -1,0 +1,10 @@
+kconfig architecture mips
+kconfig allnoconfig
+# platform configuration
+kconfig disable SGI_IP22
+kconfig enable LANTIQ
+kconfig enable SOC_XWAY
+# GPIO drivers
+kconfig enable GPIOLIB
+kconfig enable GPIO_MM_LANTIQ
+kconfig enable GPIO_STP_XWAY

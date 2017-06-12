@@ -1,0 +1,12 @@
+kconfig architecture x86
+kconfig allnoconfig
+# basic configuration
+kconfig enable DEBUG_FS
+kconfig enable SYSFS
+# platform configuration
+kconfig disable M686
+kconfig enable MELAN
+kconfig enable TS5500
+# GPIO drivers
+kconfig enable GPIOLIB
+kconfig enable GPIO_TS5500

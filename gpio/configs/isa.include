@@ -1,0 +1,8 @@
+kconfig enable ISA_BUS
+kconfig enable GPIO_104_DIO_48E
+kconfig enable GPIO_104_IDI_48
+kconfig enable GPIO_104_IDIO_16
+kconfig enable GPIO_F7188X
+kconfig enable GPIO_GPIO_MM
+kconfig enable GPIO_IT87
+kconfig enable GPIO_WS16C48

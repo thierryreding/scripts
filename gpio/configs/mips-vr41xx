@@ -1,0 +1,3 @@
+include mips-vr41xx.include
+kconfig olddefconfig
+kbuild

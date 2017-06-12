@@ -1,0 +1,3 @@
+include arm-sa1100.include
+kconfig olddefconfig
+kbuild

@@ -1,0 +1,10 @@
+kconfig architecture arm
+kconfig allnoconfig
+# basic configuration
+kconfig enable DEBUG_FS
+kconfig enable SYSFS
+# architecture configuration
+kconfig enable ARCH_LPC18XX
+# GPIO drivers
+kconfig enable GPIOLIB
+kconfig enable GPIO_LPC18XX

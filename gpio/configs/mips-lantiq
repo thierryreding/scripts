@@ -1,0 +1,3 @@
+include mips-lantiq.include
+kconfig olddefconfig
+kbuild

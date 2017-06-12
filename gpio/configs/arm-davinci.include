@@ -1,0 +1,14 @@
+kconfig architecture arm
+kconfig allnoconfig
+# basic configuration
+kconfig enable DEBUG_FS
+kconfig enable MMU
+kconfig enable SYSFS
+# architecture configuration
+kconfig disable ARM_SINGLE_ARMV7M
+kconfig enable ARCH_DAVINCI
+kconfig enable ARCH_DAVINCI_DA830
+kconfig enable MACH_DAVINCI_DA830_EVM
+# GPIO drivers
+kconfig enable GPIOLIB
+kconfig enable GPIO_DAVINCI

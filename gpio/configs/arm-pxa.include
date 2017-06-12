@@ -1,0 +1,19 @@
+kconfig architecture arm
+kconfig allnoconfig
+# basic configuration
+kconfig enable DEBUG_FS
+kconfig enable MMU
+kconfig enable SYSFS
+# architecture configuration
+kconfig disable ARM_SINGLE_ARMV7M
+kconfig enable ARCH_PXA
+kconfig enable MACH_PXA27X_DT
+kconfig enable MACH_PXA3XX_DT
+kconfig enable SOUND
+kconfig enable SND
+kconfig enable SND_PXA2XX_AC97
+# GPIO drivers
+kconfig enable GPIOLIB
+kconfig enable GPIO_PXA
+kconfig enable UCB1400_CORE
+kconfig enable GPIO_UCB1400

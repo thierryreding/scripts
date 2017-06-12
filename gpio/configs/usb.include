@@ -1,0 +1,4 @@
+kconfig enable USB_SUPPORT
+kconfig enable USB
+kconfig enable MFD_VIPERBOARD
+kconfig enable GPIO_VIPERBOARD

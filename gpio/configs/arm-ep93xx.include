@@ -1,0 +1,13 @@
+kconfig architecture arm
+kconfig allnoconfig
+# basic configuration
+kconfig enable DEBUG_FS
+kconfig enable MMU
+kconfig enable SYSFS
+# architecture configuration
+kconfig disable ARM_SINGLE_ARMV7M
+kconfig enable ARCH_EP93XX
+kconfig enable MACH_ADSSPHERE
+# GPIO drivers
+kconfig enable GPIOLIB
+kconfig enable GPIO_EP93XX

@@ -1,0 +1,84 @@
+#!/bin/sh
+
+basedir="${0%/*}"
+configdir="${basedir}/configs"
+outputdir="build/gpio"
+
+function usage()
+{
+	echo "usage: $0 [options] [config...]"
+	echo ""
+	echo "options:"
+	echo "  -h, --help     display help screen and exit"
+	echo "  -v, --verbose  increase verbosity"
+}
+
+while test $# -ne 0; do
+	case $1 in
+		-h | --help)
+			usage $0
+			exit 0
+			;;
+
+		-v | --verbose)
+			verbose=yes
+			shift
+			;;
+
+		-*)
+			usage $0
+			exit 1
+			;;
+
+		*)
+			configs="$configs $1"
+			shift
+			;;
+	esac
+done
+
+if test -z "$configs"; then
+	for config in "${configdir}"/*; do
+		configs="$configs ${config##${configdir}/}"
+	done
+fi
+
+find_users()
+{
+	git grep -l "#.*include.*$1" | while read file; do
+		case "$file" in
+			*.c)
+				echo "$file"
+				;;
+
+			*.h)
+				find_users "${file##*/}"
+				;;
+
+			*)
+				echo "WARNING: $file"
+				;;
+		esac
+	done
+}
+
+#find_users "linux/gpio/driver.h" | while read source; do
+ls drivers/gpio/*.c | while read source; do
+	base="${source%.c}"
+	object="${base}.o"
+
+	found=no
+
+	for config in $configs; do
+		KBUILD_OUTPUT="${outputdir}/${config}"
+
+		if test -f "$KBUILD_OUTPUT/$object"; then
+			found=yes
+			break
+		fi
+	done
+
+	if test "x$found" = "xno"; then
+		echo "$source is not compiled"
+	fi
+done

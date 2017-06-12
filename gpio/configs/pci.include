@@ -1,0 +1,13 @@
+kconfig enable PCI
+kconfig enable GPIO_AMD8111
+kconfig enable GPIO_BT8XX
+kconfig enable GPIO_INTEL_MID
+kconfig enable GPIO_MERRIFIELD
+kconfig enable GPIO_ML_IOH
+kconfig enable GPIO_PCH
+kconfig enable GPIO_PCI_IDIO_16
+kconfig enable TTY
+kconfig enable SERIAL_8250
+kconfig enable SERIAL_8250_PCI
+kconfig enable SERIAL_8250_EXAR
+kconfig enable GPIO_EXAR

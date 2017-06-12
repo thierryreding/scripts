@@ -1,0 +1,56 @@
+kconfig architecture arm
+kconfig allnoconfig
+# basic configuration
+kconfig enable DEBUG_FS
+kconfig enable MMU
+kconfig enable SYSFS
+# architecture configuration
+kconfig disable ARM_SINGLE_ARMV7M
+kconfig enable ARCH_MULTIPLATFORM
+kconfig enable ARCH_MULTI_V7
+# platform configuration
+kconfig enable ARCH_BCM
+kconfig enable ARCH_BCM_281XX
+kconfig enable ARCH_BRCMSTB
+kconfig enable ARCH_EMEV2
+kconfig enable ARCH_MVEBU
+kconfig enable ARCH_MXC
+kconfig enable ARCH_OMAP3
+kconfig enable ARCH_RENESAS
+kconfig enable ARCH_SOCFPGA
+kconfig enable ARCH_TEGRA
+kconfig enable ARCH_ZX
+kconfig enable ARCH_ZYNQ
+kconfig enable MACH_MX35_3DS
+kconfig enable PLAT_SPEAR
+kconfig enable SOC_IMX51
+kconfig enable SOC_VF610
+# GPIO drivers
+kconfig enable GPIOLIB
+kconfig enable GPIO_74XX_MMIO
+kconfig enable GPIO_ALTERA
+kconfig enable GPIO_BCM_KONA
+kconfig enable GPIO_BRCMSTB
+kconfig enable GPIO_DWAPB
+kconfig enable GPIO_EM
+kconfig enable GPIO_FTGPIO010
+kconfig enable GPIO_GRGPIO
+kconfig enable GPIO_MC9S08DZ60
+kconfig enable GPIO_MOCKUP
+kconfig enable GPIO_MVEBU
+kconfig enable GPIO_OMAP
+kconfig enable GPIO_PL061
+kconfig enable GPIO_RCAR
+kconfig enable GPIO_SPEAR_SPICS
+kconfig enable GPIO_TS4800
+kconfig enable GPIO_VF610
+kconfig enable GPIO_XILINX
+kconfig enable GPIO_ZEVIO
+kconfig enable GPIO_ZX
+kconfig enable GPIO_ZYNQ
+kconfig enable HTC_EGPIO
+# busses
+include i2c.include
+include mfd.include
+include spi.include
+include usb.include

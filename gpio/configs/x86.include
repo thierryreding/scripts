@@ -1,0 +1,42 @@
+kconfig architecture x86
+kconfig allnoconfig
+# basic configuration
+kconfig enable DEBUG_FS
+kconfig enable OF
+kconfig enable SMP
+kconfig enable SYSFS
+# bus support
+kconfig enable ACPI
+kconfig enable PCI
+kconfig enable MCB
+kconfig enable PC104
+# platform configuration
+kconfig enable X86_EXTENDED_PLATFORM
+kconfig enable X86_32_NON_STANDARD
+kconfig enable X86_PLATFORM_DEVICES
+kconfig enable X86_INTEL_MID
+kconfig enable INTEL_PMC_IPC
+kconfig enable INTEL_SCU_IPC
+kconfig enable INTEL_SOC_PMIC
+kconfig enable INTEL_SOC_PMIC_BXTWC
+kconfig enable STA2X11
+# GPIO drivers
+kconfig enable GPIOLIB
+kconfig enable GPIO_AMDPT
+kconfig enable GPIO_CRYSTAL_COVE
+kconfig enable GPIO_ICH
+kconfig enable GPIO_LYNXPOINT
+kconfig enable GPIO_MENZ127
+kconfig enable GPIO_MOCKUP
+kconfig enable GPIO_SCH
+kconfig enable GPIO_SCH311X
+kconfig enable GPIO_SODAVILLE
+kconfig enable GPIO_VX855
+kconfig enable GPIO_WHISKEY_COVE
+# busses
+include i2c.include
+include isa.include
+include mfd.include
+include pci.include
+include spi.include
+include usb.include

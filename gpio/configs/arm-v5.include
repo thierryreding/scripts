@@ -1,0 +1,18 @@
+kconfig architecture arm
+kconfig allnoconfig
+# basic configuration
+kconfig enable DEBUG_FS
+kconfig enable MMU
+kconfig enable SYSFS
+# architecture configuration
+kconfig disable ARM_SINGLE_ARMV7M
+kconfig enable ARCH_MULTIPLATFORM
+kconfig disable ARCH_MULTI_V7
+kconfig enable ARCH_MULTI_V5
+# platform configuration
+kconfig enable ARCH_ASPEED
+kconfig enable ARCH_MXS
+# GPIO drivers
+kconfig enable GPIOLIB
+kconfig enable GPIO_ASPEED
+kconfig enable GPIO_MXS

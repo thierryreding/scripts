@@ -1,0 +1,3 @@
+include arm-ks8695.include
+kconfig olddefconfig
+kbuild
