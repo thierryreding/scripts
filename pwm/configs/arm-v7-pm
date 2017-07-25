@@ -1,0 +1,4 @@
+include arm-v7.include
+include pm.include
+kconfig olddefconfig
+kbuild

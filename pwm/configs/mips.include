@@ -10,9 +10,12 @@ kconfig enable MFD_SYSCON
 # for PWM_JZ4740
 kconfig enable MACH_INGENIC
 kconfig enable JZ4740_QI_LB60
+# for PWM_LOONGSON1
+kconfig enable MACH_LOONGSON32
 # PWM drivers
 kconfig enable PWM
 kconfig enable PWM_IMG
 kconfig enable PWM_JZ4740
+kconfig enable PWM_LOONGSON1
 # PWM users
 include users.include

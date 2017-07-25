@@ -93,6 +93,7 @@ kconfig enable PWM_FSL_FTM
 kconfig enable PWM_HIBVT
 kconfig enable PWM_IMX
 kconfig enable PWM_LP3943
+kconfig enable PWM_MEDIATEK
 kconfig enable PWM_MESON
 kconfig enable PWM_MTK_DISP
 kconfig enable PWM_PCA9685

@@ -27,3 +27,10 @@ kconfig enable PWM_BCM2835
 kconfig enable PWM_OMAP_DMTIMER
 # PWM users
 include users.include
+# for IR_RX51
+kconfig enable MEDIA_SUPPORT
+kconfig enable INPUT
+kconfig enable MEDIA_RC_SUPPORT
+kconfig enable RC_DEVICES
+kconfig enable LIRC
+kconfig enable IR_RX51

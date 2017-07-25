@@ -1,0 +1,3 @@
+include arm-v7m.include
+kconfig olddefconfig
+kbuild

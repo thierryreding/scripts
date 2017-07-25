@@ -2,14 +2,12 @@ kconfig architecture arm
 kconfig allnoconfig
 # basic configuration
 kconfig enable DEBUG_FS
-kconfig enable MMU
 kconfig enable SYSFS
-# architecture configuration
-kconfig disable ARCH_MULTI_V7
-kconfig enable ARCH_MULTI_V4T
-kconfig enable ARCH_CLPS711X
+# for PWM_STM32
+kconfig enable ARCH_STM32
+kconfig enable MFD_STM32_TIMERS
 # PWM drivers
 kconfig enable PWM
-kconfig enable PWM_CLPS711X
+kconfig enable PWM_STM32
 # PWM users
 include users.include
