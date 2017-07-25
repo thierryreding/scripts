@@ -1,4 +1,4 @@
-v4.9-rc1
-for-4.9/fixes
-for-4.10/core
-for-4.10/drivers
+v4.12-rc1
+for-4.13/core
+for-4.13/dt
+for-4.13/drivers
