@@ -7,6 +7,7 @@ outputdir="build/pwm"
 verbose=no
 color=no
 force=no
+check=no
 JOBS=1
 
 function usage()
@@ -15,6 +16,7 @@ function usage()
 	echo ""
 	echo "options:"
 	echo "  -c, --color    colorize output"
+	echo "  -C, --check    run source code checker as part of build"
 	echo "  -f, --force    force build from scratch"
 	echo "  -h, --help     display help screen and exit"
 	echo "  -j, --jobs N   set number of parallel make jobs"
@@ -31,6 +33,11 @@ while test $# -ne 0; do
 	case $1 in
 		-c | --color)
 			color=yes
+			shift
+			;;
+
+		-C | --check)
+			check=yes
 			shift
 			;;
 
@@ -163,7 +170,15 @@ function kconfig()
 
 function kbuild()
 {
-	make ARCH=$ARCH CROSS_COMPILE=$CROSS_COMPILE O=$KBUILD_OUTPUT C=1 -j $JOBS
+	local args="ARCH=$ARCH CROSS_COMPILE=$CROSS_COMPILE"
+
+	if test "x$check" = "xyes"; then
+		args="$args C=1"
+	fi
+
+	args="$args O=$KBUILD_OUTPUT -j $JOBS"
+
+	make $args
 }
 
 if test -z "$configs"; then
