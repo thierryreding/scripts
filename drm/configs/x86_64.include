@@ -29,6 +29,7 @@ kconfig enable DRM_GMA600
 kconfig enable DRM_GMA3600
 kconfig enable DRM_I810
 kconfig enable DRM_I915
+kconfig enable DRM_I915_GVT
 kconfig enable DRM_I915_PRELIMINARY_HW_SUPPORT
 kconfig enable DRM_MGAG200
 kconfig enable DRM_MGA

@@ -22,6 +22,7 @@ kconfig enable DRM_HISI_KIRIN
 kconfig enable HISI_KIRIN_DW_DSI
 kconfig enable DRM_MEDIATEK
 kconfig enable DRM_MESON
+kconfig enable DRM_PL111
 kconfig enable DRM_TEGRA
 kconfig enable DRM_ZTE
 # panel drivers

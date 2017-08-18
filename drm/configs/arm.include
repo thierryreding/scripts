@@ -33,6 +33,7 @@ kconfig enable ARCH_RENESAS
 kconfig enable ARCH_R8A7790
 kconfig enable ARCH_R8A7791
 kconfig enable ARCH_ROCKCHIP
+kconfig enable ARCH_STM32
 kconfig enable ARCH_SUNXI
 kconfig enable ARCH_TEGRA
 kconfig enable ARCH_ZX
@@ -100,8 +101,9 @@ kconfig enable DISPLAY_PANEL_SHARP_LS037V7DW01
 kconfig enable DISPLAY_PANEL_SONY_ACX565AKM
 kconfig enable DISPLAY_PANEL_TPO_TD043MTEA1
 kconfig enable DISPLAY_PANEL_TPO_TD028TTEC1
+kconfig enable DRM_PL111
 kconfig enable DRM_RCAR_DU
-kconfig enable DRM_RCAR_HDMI
+kconfig enable DRM_RCAR_DW_HDMI
 kconfig enable DRM_RCAR_LVDS
 kconfig enable DRM_RCAR_VSP
 kconfig enable DRM_ROCKCHIP
@@ -111,9 +113,12 @@ kconfig enable ROCKCHIP_DW_HDMI
 kconfig enable ROCKCHIP_DW_MIPI_DSI
 kconfig enable ROCKCHIP_INNO_HDMI
 kconfig enable DRM_DW_HDMI_AHB_AUDIO
+kconfig enable DRM_DW_HDMI_CEC
 kconfig enable DRM_SHMOBILE
 kconfig enable DRM_STI
 kconfig enable DRM_STI_FBDEV
+kconfig enable DRM_STM
+kconfig enable DRM_STM_DSI
 kconfig enable DRM_SUN4I
 kconfig enable DRM_TEGRA
 kconfig enable DRM_TEGRA_DEBUG
@@ -121,6 +126,8 @@ kconfig enable DRM_TEGRA_STAGING
 kconfig enable DRM_TILCDC
 kconfig enable DRM_TINYDRM
 kconfig enable TINYDRM_MI0283QT
+kconfig enable TINYDRM_REPAPER
+kconfig enable TINYDRM_ST7586
 kconfig enable DRM_VGEM
 kconfig enable DRM_ZTE
 kconfig enable DRM_I2C_ADV7511

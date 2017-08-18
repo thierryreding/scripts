@@ -21,11 +21,15 @@ kconfig enable ROCKCHIP_DW_HDMI
 kconfig enable DRM_TEGRA
 # DRM panel drivers
 kconfig enable DRM_PANEL_SIMPLE
+kconfig enable DRM_PANEL_INNOLUX_P079ZCA
 kconfig enable DRM_PANEL_JDI_LT070ME05000
 kconfig enable DRM_PANEL_LG_LG4573
+kconfig enable DRM_PANEL_ORISETECH_OTM8009A
 kconfig enable DRM_PANEL_PANASONIC_VVX10F034N00
 kconfig enable DRM_PANEL_SAMSUNG_LD9040
 kconfig enable DRM_PANEL_SAMSUNG_S6E8AA0
+kconfig enable DRM_PANEL_SAMSUNG_S6E63J0X03
+kconfig enable DRM_PANEL_SEIKO_43WVF1G
 kconfig enable DRM_PANEL_SHARP_LQ101R1SX01
 kconfig enable DRM_PANEL_SHARP_LS043T1LE01
 kconfig enable DRM_PANEL_SITRONIX_ST7789V
