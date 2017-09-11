@@ -1,0 +1,4 @@
+include multi-v7.include
+kconfig enable ARM_LPAE
+kconfig olddefconfig
+kbuild

@@ -1,0 +1,3 @@
+include multi-v7.include
+kconfig olddefconfig
+kbuild
