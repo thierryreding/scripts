@@ -31,6 +31,8 @@ kconfig enable ARCH_SUNXI
 kconfig enable ARCH_TEGRA
 # for PWM_TWL and PWM_TWL_LED
 kconfig enable TWL4030_CORE
+# for PWM_ZX
+kconfig enable ARCH_ZX
 # PWM drivers
 kconfig enable PWM
 kconfig enable PWM_CROS_EC
@@ -46,6 +48,7 @@ kconfig enable PWM_TEGRA
 kconfig enable PWM_TWL
 kconfig enable PWM_TWL_LED
 kconfig enable GREYBUS_PWM
+kconfig enable PWM_ZX
 # PWM users
 include users.include
 kconfig enable COMMON_CLK_PWM

@@ -74,10 +74,13 @@ kconfig enable ARCH_TEGRA
 kconfig enable ARCH_DAVINCI_DA8XX
 kconfig enable ARCH_OMAP3
 kconfig enable ARCH_OMAP4
+kconfig enable ARCH_KEYSTONE
 # for PWM_TWL and PWM_TWL_LED
 kconfig enable TWL4030_CORE
 # for PWM_VT8500
 kconfig enable ARCH_WM8850
+# for PWM_ZX
+kconfig enable ARCH_ZX
 # PWM drivers
 kconfig enable PWM
 kconfig enable PWM_AB8500
@@ -111,6 +114,7 @@ kconfig enable PWM_TIEHRPWM
 kconfig enable PWM_TWL
 kconfig enable PWM_TWL_LED
 kconfig enable PWM_VT8500
+kconfig enable PWM_ZX
 # PWM users
 include users.include
 kconfig enable COMMON_CLK_PWM
