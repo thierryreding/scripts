@@ -168,6 +168,8 @@ function install()
 		exit 1
 	fi
 
+	mkdir -p "/srv/nfs/$SOC/boot"
+
 	cp $KBUILD_OUTPUT/arch/$ARCH/boot/$IMAGE /srv/nfs/$SOC/boot
 	cp $KBUILD_OUTPUT/arch/$ARCH/boot/$DTS/$SOC-*.dtb /srv/nfs/$SOC/boot
 
