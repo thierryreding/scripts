@@ -195,6 +195,35 @@ function install()
 	esac
 }
 
+function flash()
+{
+	if test -z "$SOC"; then
+		echo "SoC not specified"
+		exit 1
+	fi
+
+	case $SOC in
+		tegra186)
+			pm342-recovery
+			KBUILD_OUTPUT=$(cd $KBUILD_OUTPUT; pwd)
+			L4T_ROOT=/home/thierry.reding/src/l4t/stage-main/out/l4t-t186ref-debug-aarch64/full_linux_for_tegra/Linux_for_Tegra
+			oldpwd=$(pwd)
+			cd $L4T_ROOT
+			./flash.sh -k kernel \
+				-K $KBUILD_OUTPUT/arch/arm64/boot/Image \
+				-I /home/thierry.reding/src/pbs-ng.git/build/tegra186/initrd.gz \
+				-d $KBUILD_OUTPUT/arch/arm64/boot/dts/nvidia/tegra186-p2771-0000.dtb \
+				-N 192.168.69.100:/srv/nfs/tegra186 p2771-0000 eth0
+#				p2771-0000 mmcblk0p1
+			cd $oldpwd
+			;;
+
+		*)
+			echo "flashing not supported for $SOC"
+			;;
+	esac
+}
+
 if test "$(type -t $CMD 2> /dev/null)" = 'function'; then
 	cross_compile_prepare $ARCH
 	$CMD "$@"; rc=$?
