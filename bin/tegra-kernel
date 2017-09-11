@@ -135,6 +135,11 @@ function build()
 				shift
 				;;
 
+			-k | --keep-going)
+				ARGS="--keep-going"
+				shift
+				;;
+
 			*)
 				break
 				;;
