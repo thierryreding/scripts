@@ -150,8 +150,10 @@ function build()
 		ARGS="$ARGS C=1"
 	fi
 
-	nice make -j $JOBS $ARGS oldconfig
+	nice make -j $JOBS $ARGS oldconfig || return $?
 	nice make -j $JOBS $ARGS 2>&1 | tee "$KBUILD_OUTPUT/build.log"
+
+	return ${PIPESTATUS[0]}
 }
 
 function clean()
@@ -193,8 +195,11 @@ function install()
 
 if test "$(type -t $CMD 2> /dev/null)" = 'function'; then
 	cross_compile_prepare $ARCH
-	$CMD "$@"
+	$CMD "$@"; rc=$?
 	cross_compile_cleanup
 else
 	echo "$CMD: no such command"
+	rc=1
 fi
+
+exit $rc
