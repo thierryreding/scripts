@@ -1,0 +1,26 @@
+kconfig architecture x86
+kconfig allnoconfig
+kconfig enable DEBUG_SECTION_MISMATCH
+kconfig enable SECTION_MISMATCH_WARN_ONLY
+kconfig enable X86_EXTENDED_PLATFORM
+kconfig enable X86_PLATFORM_DEVICES
+kconfig enable X86_UP_APIC
+kconfig enable X86_INTEL_MID
+kconfig enable DEBUG_FS
+kconfig enable PCI
+kconfig enable AGP
+kconfig enable AGP_INTEL
+kconfig enable USB_SUPPORT
+kconfig enable VIRTIO_MMIO
+kconfig enable VGA_SWITCHEROO
+kconfig enable DRM
+kconfig enable DRM_LEGACY
+kconfig enable DRM_TDFX
+kconfig enable DRM_R128
+kconfig enable DRM_I810
+kconfig enable DRM_MGA
+kconfig enable DRM_SAVAGE
+kconfig enable DRM_SIS
+kconfig enable DRM_VIA
+kconfig olddefconfig
+kbuild
