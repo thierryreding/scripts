@@ -52,7 +52,9 @@ find_users()
 				;;
 
 			*.h)
-				find_users "${file##*/}"
+				if test "x$recurse" = "xyes"; then
+					find_users "${file##*/}"
+				fi
 				;;
 
 			*)
@@ -62,8 +64,8 @@ find_users()
 	done
 }
 
-#find_users "linux/gpio/driver.h" | while read source; do
-ls drivers/gpio/*.c | while read source; do
+find_users "linux/gpio/driver.h" | while read source; do
+#ls drivers/gpio/*.c | while read source; do
 	base="${source%.c}"
 	object="${base}.o"
 
