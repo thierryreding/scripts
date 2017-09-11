@@ -100,13 +100,7 @@ esac
 
 function configure()
 {
-	if test ! -f "$KBUILD_OUTPUT/.config"; then
-		CONFIG="${1-$DEFCONFIG}"
-	else
-		CONFIG=oldconfig
-	fi
-
-	nice make -j $JOBS $CONFIG
+	nice make -j $JOBS ${1-$DEFCONFIG}
 }
 
 function defconfig()
