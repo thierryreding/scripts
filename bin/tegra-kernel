@@ -49,9 +49,10 @@ while test $# -gt 0; do
 done
 
 if test -z "$SOC"; then
+	ALL_SOCS="tegra20 tegra30 tegra114 tegra124 tegra132 tegra210 tegra186"
 	rc=0
 
-	for SOC in tegra20 tegra30 tegra114 tegra124 tegra132 tegra210; do
+	for SOC in $ALL_SOCS; do
 		$SELF --soc $SOC $ARGS || exit $?
 	done
 
@@ -63,7 +64,7 @@ case $SOC in
 		ARCH=arm
 		;;
 
-	tegra132 | tegra210)
+	tegra132 | tegra210 | tegra186)
 		ARCH=arm64
 		;;
 
