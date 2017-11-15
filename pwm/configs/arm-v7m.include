@@ -6,8 +6,11 @@ kconfig enable SYSFS
 # for PWM_STM32
 kconfig enable ARCH_STM32
 kconfig enable MFD_STM32_TIMERS
+# for PWM_STM32_LP
+kconfig enable MFD_STM32_LPTIMER
 # PWM drivers
 kconfig enable PWM
 kconfig enable PWM_STM32
+kconfig enable PWM_STM32_LP
 # PWM users
 include users.include

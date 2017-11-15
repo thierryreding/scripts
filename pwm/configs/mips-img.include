@@ -1,0 +1,8 @@
+include mips.include
+# for PWM_IMG
+kconfig enable MACH_PISTACHIO
+# PWM drivers
+kconfig enable PWM
+kconfig enable PWM_IMG
+# PWM users
+include users.include

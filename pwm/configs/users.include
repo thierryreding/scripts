@@ -6,6 +6,7 @@ kconfig enable INPUT_MAX77693_HAPTIC
 kconfig enable MFD_MAX8997
 kconfig enable INPUT_MAX8997_HAPTIC
 kconfig enable INPUT_PWM_BEEPER
+kconfig enable INPUT_PWM_VIBRA
 kconfig enable NEW_LEDS
 kconfig enable LEDS_CLASS
 kconfig enable LEDS_LP8788
@@ -26,3 +27,8 @@ kconfig enable POWER_SUPPLY
 kconfig enable CHARGER_LP8788
 kconfig enable RTC_CLASS
 kconfig enable RTC_DRV_LP8788
+kconfig enable RC_CORE
+kconfig enable RC_DECODERS
+kconfig enable LIRC
+kconfig enable RC_DEVICES
+kconfig enable IR_PWM_TX

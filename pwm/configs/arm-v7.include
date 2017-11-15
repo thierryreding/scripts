@@ -81,6 +81,9 @@ kconfig enable TWL4030_CORE
 kconfig enable ARCH_WM8850
 # for PWM_ZX
 kconfig enable ARCH_ZX
+# for GPIO_MVEBU
+kconfig enable ARCH_MVEBU
+kconfig enable GPIOLIB
 # PWM drivers
 kconfig enable PWM
 kconfig enable PWM_AB8500
@@ -115,6 +118,8 @@ kconfig enable PWM_TWL
 kconfig enable PWM_TWL_LED
 kconfig enable PWM_VT8500
 kconfig enable PWM_ZX
+# GPIO PWM drivers
+kconfig enable GPIO_MVEBU
 # PWM users
 include users.include
 kconfig enable COMMON_CLK_PWM
