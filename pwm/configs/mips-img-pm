@@ -1,0 +1,4 @@
+include mips-img.include
+include pm.include
+kconfig olddefconfig
+kbuild
