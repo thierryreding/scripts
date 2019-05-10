@@ -21,3 +21,4 @@ kconfig enable PWM_MXS
 include users.include
 kconfig enable FB
 kconfig enable FB_SSD1307
+kconfig enable TS_NBUS
