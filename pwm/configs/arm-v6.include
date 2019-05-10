@@ -4,6 +4,8 @@ kconfig allnoconfig
 kconfig enable ATAGS
 kconfig enable DEBUG_FS
 kconfig enable MMU
+kconfig enable MODULES
+kconfig enable MODULE_UNLOAD
 kconfig enable SYSFS
 # architecture configuration
 kconfig disable ARM_SINGLE_ARMV7M

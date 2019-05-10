@@ -3,6 +3,8 @@ kconfig allnoconfig
 # basic configuration
 kconfig enable DEBUG_FS
 kconfig enable MMU
+kconfig enable MODULES
+kconfig enable MODULE_UNLOAD
 kconfig enable SYSFS
 # bus configuration
 kconfig enable I2C

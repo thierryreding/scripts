@@ -2,6 +2,8 @@ kconfig architecture arm
 kconfig allnoconfig
 # basic configuration
 kconfig enable DEBUG_FS
+kconfig enable MODULES
+kconfig enable MODULE_UNLOAD
 kconfig enable SYSFS
 # for PWM_STM32
 kconfig enable ARCH_STM32
