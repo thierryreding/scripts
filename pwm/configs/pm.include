@@ -1,1 +1,2 @@
+kconfig enable PM
 kconfig enable SUSPEND
