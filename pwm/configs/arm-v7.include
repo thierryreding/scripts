@@ -101,6 +101,7 @@ kconfig enable PWM_FSL_FTM
 kconfig enable PWM_HIBVT
 kconfig module PWM_IMX1
 kconfig module PWM_IMX27
+kconfig module PWM_IMX_TPM
 kconfig enable PWM_LP3943
 kconfig enable PWM_MEDIATEK
 kconfig enable PWM_MESON
