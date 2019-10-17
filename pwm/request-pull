@@ -34,7 +34,8 @@ repository=git://git.kernel.org/pub/scm/linux/kernel/git/thierry.reding/linux-pw
 remote=pwm
 
 to="Linus Torvalds <torvalds@linux-foundation.org>"
-cc="linux-pwm@vger.kernel.org"
+cc="Uwe Kleine-König <u.kleine-koenig@pengutronix.de>"
+cc="$cc, linux-pwm@vger.kernel.org"
 cc="$cc, linux-kernel@vger.kernel.org"
 
 if test -n "$cc_extra"; then
