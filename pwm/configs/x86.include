@@ -6,6 +6,7 @@ kconfig enable SYSFS
 # for PWM_CRC
 kconfig enable GPIOLIB
 kconfig enable I2C
+kconfig enable I2C_DESIGNWARE_PLATFORM
 kconfig enable INTEL_SOC_PMIC
 # for PWM_LPSS_PCI
 kconfig enable PCI

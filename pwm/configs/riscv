@@ -1,0 +1,3 @@
+include riscv.include
+kconfig olddefconfig
+kbuild

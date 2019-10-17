@@ -25,6 +25,8 @@ kconfig enable ARCH_MEDIATEK
 kconfig enable ARCH_ROCKCHIP
 # for PWM_SAMSUNG
 kconfig enable ARCH_EXYNOS
+# for PWM_SPRD
+kconfig enable ARCH_SPRD
 # for PWM_STMPE
 kconfig enable MFD_STMPE
 # for PWM_SUN4I
@@ -44,6 +46,7 @@ kconfig enable PWM_MTK_DISP
 kconfig enable PWM_PCA9685
 kconfig enable PWM_ROCKCHIP
 kconfig enable PWM_SAMSUNG
+kconfig enable PWM_SPRD
 kconfig enable PWM_STMPE
 kconfig enable PWM_SUN4I
 kconfig enable PWM_TEGRA
