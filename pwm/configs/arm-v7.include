@@ -38,6 +38,8 @@ kconfig enable ARCH_BCM_5301X
 kconfig enable ARCH_BERLIN
 # for PWM_CROS_EC
 kconfig enable MFD_CROS_EC
+# for PWM_IQS620A
+kconfig enable MFD_IQS62X
 # for PWM_HIBVT
 kconfig enable ARCH_HISI
 # for PWM_IMX1 and PWM_IMX27
@@ -102,6 +104,7 @@ kconfig enable PWM_HIBVT
 kconfig module PWM_IMX1
 kconfig module PWM_IMX27
 kconfig module PWM_IMX_TPM
+kconfig module PWM_IQS620A
 kconfig enable PWM_LP3943
 kconfig enable PWM_MEDIATEK
 kconfig enable PWM_MESON

@@ -8,17 +8,24 @@ kconfig enable GPIOLIB
 kconfig enable I2C
 kconfig enable I2C_DESIGNWARE_PLATFORM
 kconfig enable INTEL_SOC_PMIC
+# for PWM_IQS620A
+kconfig enable MFD_IQS62X
 # for PWM_LPSS_PCI
 kconfig enable PCI
 # for PWM_LPSS_PLATFORM
 kconfig enable ACPI
+# for PWM_INTEL_LGM
+kconfig enable OF
 # PWM drivers
 kconfig enable PWM
 kconfig enable PWM_CRC
+kconfig enable PWM_DWC
+kconfig enable PWM_IQS620A
 kconfig enable PWM_LPSS
 kconfig enable PWM_LPSS_PCI
 kconfig enable PWM_LPSS_PLATFORM
 kconfig enable PWM_PCA9685
+kconfig enable PWM_INTEL_LGM
 # PWM users
 include users.include
 kconfig enable DRM

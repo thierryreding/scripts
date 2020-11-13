@@ -17,6 +17,10 @@ kconfig enable GREYBUS_BRIDGED_PHY
 kconfig enable MFD_CROS_EC
 # for PWM_HIBVT
 kconfig enable ARCH_HISI
+# for PWM_IQS620A
+kconfig enable MFD_IQS62X
+# for PWM_KEEMBAY
+kconfig enable ARCH_KEEMBAY
 # for PWM_MESON
 kconfig enable ARCH_MESON
 # for PWM_MTK_DISP
@@ -25,6 +29,8 @@ kconfig enable ARCH_MEDIATEK
 kconfig enable ARCH_ROCKCHIP
 # for PWM_SAMSUNG
 kconfig enable ARCH_EXYNOS
+# for PWM_SL28CPLD
+kconfig enable MFD_SL28CPLD
 # for PWM_SPRD
 kconfig enable ARCH_SPRD
 # for PWM_STMPE
@@ -41,11 +47,14 @@ kconfig enable ARCH_ZX
 kconfig enable PWM
 kconfig enable PWM_CROS_EC
 kconfig enable PWM_HIBVT
+kconfig enable PWM_IQS620A
+kconfig enable PWM_KEEMBAY
 kconfig enable PWM_MESON
 kconfig enable PWM_MTK_DISP
 kconfig enable PWM_PCA9685
 kconfig enable PWM_ROCKCHIP
 kconfig enable PWM_SAMSUNG
+kconfig enable PWM_SL28CPLD
 kconfig enable PWM_SPRD
 kconfig enable PWM_STMPE
 kconfig enable PWM_SUN4I
