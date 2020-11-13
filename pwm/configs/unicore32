@@ -1,3 +1,0 @@
-include unicore32.include
-kconfig olddefconfig
-kbuild
