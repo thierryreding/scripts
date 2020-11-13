@@ -1,83 +1,146 @@
-#!/bin/sh
+#!/usr/bin/python3
+#
+# example: ./coverage build/pwm linux/pwm.h
+#
 
-basedir="${0%/*}"
-configdir="${basedir}/configs"
-outputdir="build/pwm"
+import argparse, os, subprocess, sys
 
-function usage()
-{
-	echo "usage: $0 [options] [config...]"
-	echo ""
-	echo "options:"
-	echo "  -h, --help     display help screen and exit"
-	echo "  -v, --verbose  increase verbosity"
-}
+class Log:
+    COLOR_NONE = '\033[0m'
+    COLOR_RED = '\033[31;1m'
+    COLOR_GREEN = '\033[32;1m'
+    COLOR_YELLOW = '\033[33;1m'
+    COLOR_BLUE = '\033[34;1m'
+    COLOR_MAGENTA = '\033[35;1m'
 
-while test $# -ne 0; do
-	case $1 in
-		-h | --help)
-			usage $0
-			exit 0
-			;;
+    def __init__(self, colorize = True):
+        self.color = Log.COLOR_NONE
+        self.colorize = colorize
+        self.stack = []
 
-		-v | --verbose)
-			verbose=yes
-			shift
-			;;
+    def push(self, obj, color = None):
+        if not self.colorize:
+            color = None
 
-		-*)
-			usage $0
-			exit 1
-			;;
+        if not color:
+            return str(obj)
 
-		*)
-			configs="$configs $1"
-			shift
-			;;
-	esac
-done
+        self.stack.append(self.color)
+        self.color = color
 
-if test -z "$configs"; then
-	for config in "${configdir}"/*; do
-		configs="$configs ${config##${configdir}/}"
-	done
-fi
+        return self.color + str(obj)
 
-find_users()
-{
-	git grep -l "#.*include.*$1" | while read file; do
-		case "$file" in
-			*.c)
-				echo "$file"
-				;;
+    def pop(self, obj = None):
+        if self.colorize:
+            if self.stack:
+                self.color = self.stack.pop()
+            else:
+                raise Exception('unbalanced Log.pop()')
 
-			*.h)
-				find_users "${file##*/}"
-				;;
+        if obj is None:
+            return ''
 
-			*)
-				echo "WARNING: $file"
-				;;
-		esac
-	done
-}
+        if self.colorize:
+            return self.color + str(obj)
 
-find_users "linux/pwm.h" | while read source; do
-	base="${source%.c}"
-	object="${base}.o"
+        return str(obj)
 
-	found=no
+    def wrap(self, obj, color = None):
+        if not self.colorize:
+            color = None
 
-	for config in $configs; do
-		KBUILD_OUTPUT="${outputdir}/${config}"
+        if not color:
+            return str(obj)
 
-		if test -f "$KBUILD_OUTPUT/$object"; then
-			found=yes
-			break
-		fi
-	done
+        return color + str(obj) + Log.COLOR_NONE
 
-	if test "x$found" = "xno"; then
-		echo "$source is not compiled"
-	fi
-done
+    def red(self, obj, push = False):
+        func = self.push if push else self.wrap
+
+        return func(obj, Log.COLOR_RED)
+
+    def green(self, obj, push = False):
+        func = self.push if push else self.wrap
+
+        return func(obj, Log.COLOR_GREEN)
+
+    def yellow(self, obj, push = False):
+        func = self.push if push else self.wrap
+
+        return func(obj, Log.COLOR_YELLOW)
+
+    def blue(self, obj, push = False):
+        func = self.push if push else self.wrap
+
+        return func(obj, Log.COLOR_BLUE)
+
+    def magenta(self, obj, push = False):
+        func = self.push if push else self.wrap
+
+        return func(obj, Log.COLOR_MAGENTA)
+
+def find_includers(filenames):
+    for filename in filenames:
+        proc = subprocess.run(['cscope', '-L8', filename], capture_output = True)
+        for line in proc.stdout.decode().splitlines():
+            source, scope, line, statement = line.split(maxsplit = 3)
+
+            base, ext = os.path.splitext(source)
+            if ext == '.h':
+                source = os.path.sep.join(source.split(os.path.sep)[1:])
+                yield from find_includers([source])
+            else:
+                yield source
+
+def find_file(base, filename):
+    path = os.path.join(base, filename)
+    matches = []
+
+    if os.path.exists(path):
+        return [ path ]
+
+    with os.scandir(base) as it:
+        for entry in it:
+            # skip "source" symlinks because they lead to circles
+            if entry.is_symlink() and entry.name == 'source':
+                continue
+
+            if entry.is_dir():
+                match = find_file(os.path.join(base, entry.name), filename)
+                if match:
+                    matches.extend(match)
+
+    return matches
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--colorize', action = 'store_true')
+    parser.add_argument('KBUILD_OUTPUT')
+    parser.add_argument('FILENAME', nargs = '+')
+    args = parser.parse_args()
+
+    log = Log(args.colorize)
+
+    # update cscope
+    print('%s generating cscope database...' % log.yellow('*'), end = '')
+    sys.stdout.flush()
+
+    proc = subprocess.run(['make', 'cscope'], capture_output = True)
+    if proc.returncode != 0:
+        print('%s' % log.red('failed'))
+    else:
+        print('%s' % log.green('done'))
+
+    print('%s finding object files in %s:' % (log.yellow('*'), log.magenta(args.KBUILD_OUTPUT)))
+
+    for src in find_includers(args.FILENAME):
+        print('  %s %s...' % (log.yellow('-'), log.blue(src)), end = '')
+        sys.stdout.flush()
+
+        obj = '%s.o' % os.path.splitext(src)[0]
+
+        matches = find_file(args.KBUILD_OUTPUT, obj)
+        if not matches:
+            print('%s' % log.red('not found'))
+        else:
+            print('%s' % log.green('found'))
