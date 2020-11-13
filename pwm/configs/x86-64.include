@@ -1,0 +1,33 @@
+kconfig architecture x86
+kconfig allnoconfig
+# basic configuration
+kconfig enable 64BIT
+kconfig enable DEBUG_FS
+kconfig enable SYSFS
+# for PWM_CRC
+kconfig enable GPIOLIB
+kconfig enable I2C
+kconfig enable I2C_DESIGNWARE_PLATFORM
+kconfig enable INTEL_SOC_PMIC
+# for PWM_IQS620A
+kconfig enable MFD_IQS62X
+# for PWM_LPSS_PCI
+kconfig enable PCI
+# for PWM_LPSS_PLATFORM
+kconfig enable ACPI
+# for PWM_INTEL_LGM
+kconfig enable PWM_INTEL_LGM
+# PWM drivers
+kconfig enable PWM
+kconfig enable PWM_CRC
+kconfig enable PWM_DWC
+kconfig enable PWM_IQS620A
+kconfig enable PWM_LPSS
+kconfig enable PWM_LPSS_PCI
+kconfig enable PWM_LPSS_PLATFORM
+kconfig enable PWM_PCA9685
+# PWM users
+include users.include
+kconfig enable DRM
+kconfig enable DRM_I915
+kconfig enable MFD_INTEL_SOC_PMIC
