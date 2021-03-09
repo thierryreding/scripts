@@ -135,15 +135,13 @@ awk "/^#/ || /^$/ { next }; $FILTER { print \$2\" \"\$4\" \"\$5\" \"\$7 }" board
 
 		if test "x$rc" != "x0"; then
 			echo -e "\033[1;31mfailed ($rc)\033[0m"
-			rc=77
-			break
+			exit $rc
 		else
 			if test -s "$KBUILD_OUTPUT/error.log"; then
 				echo -e "\033[1;33mdone ($rc)\033[0m"
 
 				if test "x$strict" = "xyes"; then
-					rc=77
-					break
+					exit 77
 				fi
 			else
 				echo -e "\033[1;32mdone\033[0m"
@@ -153,4 +151,4 @@ awk "/^#/ || /^$/ { next }; $FILTER { print \$2\" \"\$4\" \"\$5\" \"\$7 }" board
 		cross_compile_cleanup
 	done
 
-exit $rc
+exit ${PIPESTATUS[1]}
