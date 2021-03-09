@@ -225,6 +225,38 @@ function build()
 	return $rc
 }
 
+function dtbs()
+{
+	while test $# -gt 0; do
+		if test -n "$prev"; then
+			eval "$prev=$1"
+			shift; prev=
+			continue
+		fi
+
+		case $1 in
+			*)
+				break
+				;;
+		esac
+	done
+
+	nice make -j $JOBS oldconfig || return $?
+	nice make -j $JOBS dtbs 2>&1 | tee "$KBUILD_OUTPUT/build.log"
+
+	rc=${PIPESTATUS[0]}
+
+	if test "x$rc" = "x0"; then
+		status="Completed"
+	else
+		status="Failed"
+	fi
+
+	notify-send "tegra-kernel" "$status DTBs built for $SOC"
+
+	return $rc
+}
+
 function clean()
 {
 	nice make -j $JOBS clean
