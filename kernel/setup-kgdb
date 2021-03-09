@@ -1,0 +1,36 @@
+#!/bin/sh
+
+if test "x$1" = "x"; then
+	TTY=/dev/ttyUSB4
+else
+	TTY="$1"
+fi
+
+if test "x$2" = "x"; then
+	BAUD=115200
+else
+	BAUD="$2"
+fi
+
+if test "x$3" = "x"; then
+	CONS_PORT=4440
+else
+	CONS_PORT="$3"
+fi
+
+if test "x$4" = "x"; then
+	KGDB_PORT=4441
+else
+	KGDB_PORT="$4"
+fi
+
+NAME="${TTY##*/}"
+
+GDB=${CROSS_COMPILE}gdb
+SCREENRC=`mktemp`
+
+sed -e "s|@TTY@|$TTY|;s|@BAUD@|$BAUD|;s|@CONS_PORT@|$CONS_PORT|;s|@KGDB_PORT@|$KGDB_PORT|;s|@GDB@|$GDB|" "${0}.screen" > "$SCREENRC"
+
+screen -S kgdb.$NAME -c "$SCREENRC"
+
+rm "$SCREENRC"

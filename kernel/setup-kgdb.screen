@@ -1,0 +1,8 @@
+defscrollback 65536
+
+screen -t proxy agent-proxy @CONS_PORT@\^@KGDB_PORT@ 0 @TTY@,@BAUD@
+screen -t console telnet localhost @CONS_PORT@
+screen -t kgdb
+
+hardstatus alwayslastline
+hardstatus string '%{= kG}[ %{G}%H %{g}][%= %{= kw}%?%-Lw%?%{r}(%{W}%n*%f%t%?(%u)%?%{r})%{w}%?%+Lw%?%?%= %{g}][%{B} %Y-%m-%d %{W}%c %{g}]'
