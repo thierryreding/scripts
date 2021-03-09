@@ -161,6 +161,11 @@ function olddefconfig()
 	nice make -j $JOBS olddefconfig
 }
 
+function version()
+{
+	nice make -j $JOBS -s kernelrelease
+}
+
 function build()
 {
 	local ARGS
