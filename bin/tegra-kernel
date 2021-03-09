@@ -257,6 +257,28 @@ function dtbs()
 	return $rc
 }
 
+function check()
+{
+	local ARGS
+
+	while test $# -gt 0; do
+		case $1 in
+			*)
+				break
+				;;
+		esac
+	done
+
+	ARGS="$ARGS dt_binding_check"
+	ARGS="$ARGS dtbs_check"
+
+	echo "ARGS: $ARGS"
+	nice make -j $JOBS $ARGS 2>&1 | tee "$KBUILD_OUTPUT/check.log"
+
+	rc=${PIPESTATUS[0]}
+	return $rc
+}
+
 function clean()
 {
 	nice make -j $JOBS clean
