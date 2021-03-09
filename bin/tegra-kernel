@@ -46,6 +46,11 @@ while test $# -gt 0; do
 			shift
 			;;
 
+		-v | --verbose)
+			KBUILD_VERBOSE=1
+			shift
+			;;
+
 		-w | --warnings)
 			KBUILD_ENABLE_EXTRA_GCC_CHECKS=1
 			shift
@@ -89,6 +94,7 @@ KBUILD_OUTPUT=${KBUILD_OUTPUT}/$SOC
 
 export KBUILD_ENABLE_EXTRA_GCC_CHECKS
 export KBUILD_CHECKSRC
+export KBUILD_VERBOSE
 export KBUILD_OUTPUT
 export ARCH
 
