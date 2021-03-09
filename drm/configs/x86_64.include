@@ -1,5 +1,6 @@
 kconfig architecture x86_64
 kconfig allnoconfig
+kconfig enable EXPERT
 kconfig enable DEBUG_SECTION_MISMATCH
 kconfig enable IA32_EMULATION
 kconfig enable COMPAT
@@ -10,8 +11,14 @@ kconfig enable PCI
 kconfig enable AGP
 kconfig enable AGP_INTEL
 kconfig enable USB_SUPPORT
+kconfig enable VIRTIO_MENU
 kconfig enable VIRTIO_MMIO
 kconfig enable VGA_SWITCHEROO
+# for DRM_XEN
+kconfig enable HYPERVISOR_GUEST
+kconfig enable PARAVIRT
+kconfig enable XEN
+# DRM drivers
 kconfig enable DRM
 kconfig enable DRM_DP_AUX_CHARDEV
 kconfig enable DRM_LOAD_EDID_FIRMWARE
@@ -20,6 +27,7 @@ kconfig enable DRM_AMDGPU_CIK
 kconfig enable DRM_AMDGPU_SI
 kconfig enable DRM_AMDGPU_USERPTR
 kconfig enable DRM_AMD_ACP
+kconfig enable DRM_AMD_DC_DCN1_0
 kconfig enable DRM_AMD_POWERPLAY
 kconfig enable DRM_AST
 kconfig enable DRM_BOCHS
@@ -30,6 +38,7 @@ kconfig enable DRM_GMA3600
 kconfig enable DRM_I810
 kconfig enable DRM_I915
 kconfig enable DRM_I915_GVT
+kconfig enable DRM_I915_SELFTEST
 kconfig enable DRM_I915_PRELIMINARY_HW_SUPPORT
 kconfig enable DRM_MGAG200
 kconfig enable DRM_MGA
@@ -55,3 +64,5 @@ kconfig enable IOMMU_SUPPORT
 kconfig enable AMD_IOMMU
 kconfig enable AMD_IOMMU_V2
 kconfig enable HSA_AMD
+kconfig enable DRM_XEN
+kconfig enable DRM_XEN_FRONTEND
