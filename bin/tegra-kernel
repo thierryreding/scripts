@@ -156,6 +156,11 @@ function savedefconfig()
 	nice make -j $JOBS savedefconfig
 }
 
+function olddefconfig()
+{
+	nice make -j $JOBS olddefconfig
+}
+
 function build()
 {
 	local ARGS
