@@ -1,0 +1,75 @@
+#!/bin/sh -e
+
+dry_run=no
+
+while test $# -gt 0; do
+	case $1 in
+		--cc)
+			extract=Cc:
+			shift
+			;;
+
+		-d | --directory)
+			directory="$2"
+			shift 2
+			;;
+
+		-n | --dry-run)
+			dry_run=yes
+			shift
+			;;
+
+		--to)
+			extract=To:
+			shift
+			;;
+
+		*)
+			break
+			;;
+	esac
+done
+
+if test "x$directory" = "x"; then
+	directory=.
+fi
+
+if ! test -f "$directory/recipients"; then
+	echo "$directory/recipients not found"
+	exit 1
+fi
+
+if test "x$extract" != "x"; then
+	while read header recipient; do
+		if test "x$header" = "x$extract"; then
+			echo "$recipient"
+		fi
+	done < "$directory/recipients"
+
+	exit 0
+fi
+
+#
+# quoting here doesn't work properly, but I have no idea how to fix it, so
+# we need to rely on the --to-cmd and --cc-cmd arguments to git send-email
+#
+#while read header recipient; do
+#	if test "x$header" = "xTo:"; then
+#		recipients="$recipients --to '\\'$recipient'\\'"
+#	fi
+#
+#	if test "x$header" = "xCc:"; then
+#		recipients="$recipients --cc '\\'$recipient'\\'"
+#	fi
+#done < "$directory/recipients"
+#
+#echo "recipients: $recipients"
+
+if test "x$dry_run" = "xyes"; then
+	args="$args --dry-run"
+fi
+
+git send-email --suppress-cc=author --suppress-cc=sob $args \
+	--to-cmd "$0 --directory $directory --to" \
+	--cc-cmd "$0 --directory $directory --cc" \
+	"$directory"/*.patch
