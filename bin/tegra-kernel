@@ -9,6 +9,7 @@ SELF=$0
 ARGS=$@
 CMD=build
 KBUILD_CHECKSRC=0
+KBUILD_ENABLE_EXTRA_GCC_CHECKS=
 MAKE_ARGS=
 pwd=`pwd`
 
@@ -37,6 +38,16 @@ while test $# -gt 0; do
 
 		-j | --jobs)
 			prev=JOBS
+			shift
+			;;
+
+		-p | --pedantic)
+			KBUILD_ENABLE_EXTRA_GCC_CHECKS=2
+			shift
+			;;
+
+		-w | --warnings)
+			KBUILD_ENABLE_EXTRA_GCC_CHECKS=1
 			shift
 			;;
 
@@ -75,6 +86,8 @@ case $SOC in
 esac
 
 KBUILD_OUTPUT=${KBUILD_OUTPUT}/$SOC
+
+export KBUILD_ENABLE_EXTRA_GCC_CHECKS
 export KBUILD_CHECKSRC
 export KBUILD_OUTPUT
 export ARCH
