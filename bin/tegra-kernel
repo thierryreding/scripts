@@ -11,6 +11,7 @@ CMD=build
 KBUILD_CHECKSRC=0
 KBUILD_ENABLE_EXTRA_GCC_CHECKS=
 MAKE_ARGS=
+NFSBOOT=no
 pwd=`pwd`
 
 while test $# -gt 0; do
@@ -56,6 +57,11 @@ while test $# -gt 0; do
 			shift
 			;;
 
+		-N | --nfs)
+			NFSBOOT=yes
+			shift
+			;;
+
 		*)
 			CMD=$1
 			shift
@@ -65,7 +71,7 @@ while test $# -gt 0; do
 done
 
 if test -z "$SOC"; then
-	ALL_SOCS="tegra20 tegra30 tegra114 tegra124 tegra132 tegra210 tegra186"
+	ALL_SOCS="tegra20 tegra30 tegra114 tegra124 tegra132 tegra210 tegra186 tegra194"
 	rc=0
 
 	for SOC in $ALL_SOCS; do
@@ -80,7 +86,7 @@ case $SOC in
 		ARCH=arm
 		;;
 
-	tegra132 | tegra210 | tegra186)
+	tegra132 | tegra210 | tegra186 | tegra194)
 		ARCH=arm64
 		;;
 
@@ -234,6 +240,43 @@ function flash()
 				-d $KBUILD_OUTPUT/arch/arm64/boot/dts/nvidia/tegra186-p2771-0000.dtb \
 				-N 192.168.69.100:/srv/nfs/tegra186 p2771-0000 eth0
 #				p2771-0000 mmcblk0p1
+			cd $oldpwd
+			;;
+
+		tegra194)
+			extra_args=""
+
+			if test "x$NFSBOOT" = "xyes"; then
+				extra_args="$extra_args -N 192.168.23.1:/srv/nfs/tegra194"
+				extra_args="$extra_args -I /home/thierry.reding/src/pbs-ng.git/build/tegra194/initrd.gz"
+				boot_device=eth0
+			else
+				boot_device=mmcblk0p1
+			fi
+
+			KBUILD_OUTPUT=$(cd $KBUILD_OUTPUT; pwd)
+			L4T_ROOT=$HOME/src/l4t/stage-main/out/l4t-t186ref-debug-aarch64/full_linux_for_tegra/Linux_for_Tegra
+
+			if test -f "$L4T_ROOT/system.img"; then
+				extra_args="$extra_args -r"
+			fi
+
+			oldpwd=$(pwd)
+			cd $L4T_ROOT
+			pm342-recovery
+			./flash.sh -r -k kernel-dtb \
+				-K $KBUILD_OUTPUT/arch/arm64/boot/Image \
+				-d $KBUILD_OUTPUT/arch/arm64/boot/dts/nvidia/tegra194-p2972-0000.dtb \
+				-C 'ignore_loglevel earlyprintk drm.debug=0x1f' \
+				$extra_args \
+				jetson-xavier $boot_device
+			pm342-recovery
+			./flash.sh -r -k kernel \
+				-K $KBUILD_OUTPUT/arch/arm64/boot/Image \
+				-d $KBUILD_OUTPUT/arch/arm64/boot/dts/nvidia/tegra194-p2972-0000.dtb \
+				-C 'ignore_loglevel earlyprintk drm.debug=0x1f' \
+				$extra_args \
+				jetson-xavier $boot_device
 			cd $oldpwd
 			;;
 
