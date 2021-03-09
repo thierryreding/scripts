@@ -96,8 +96,16 @@ case $SOC in
 		;;
 esac
 
+#
+# We need to override pkg-config's libdir here to make it point at the build
+# system. This ensures that the kernel build system can pick up the right .pc
+# files even if the PATH contains a cross-compilation pkg-config script.
+#
+PKG_CONFIG_LIBDIR=/usr/lib/pkgconfig
+
 KBUILD_OUTPUT=${KBUILD_OUTPUT}/$SOC
 
+export PKG_CONFIG_LIBDIR
 export KBUILD_ENABLE_EXTRA_GCC_CHECKS
 export KBUILD_CHECKSRC
 export KBUILD_VERBOSE
