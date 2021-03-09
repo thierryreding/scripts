@@ -345,6 +345,29 @@ function flash()
 	esac
 }
 
+function nvgpu()
+{
+	local ARGS
+
+	if test -z "$SOC"; then
+		echo "SoC not specified"
+		exit 1
+	fi
+
+	NVGPU="/home/thierry.reding/src/l4t/nvgpu.git"
+	ARGS="$ARGS M=$NVGPU/drivers/gpu/nvgpu"
+	ARGS="$ARGS srctree.nvgpu=$NVGPU"
+
+	if test "x$1" = "xbuild" -o "x$1" = "x"; then
+		nice make -j $JOBS $ARGS modules
+	fi
+
+	if test "x$1" = "xinstall"; then
+		ARGS="$ARGS INSTALL_MOD_PATH=/srv/nfs/$SOC/usr"
+		nice make -j $JOBS $ARGS modules_install
+	fi
+}
+
 if test "$(type -t $CMD 2> /dev/null)" = 'function'; then
 	cross_compile_prepare $ARCH
 	$CMD "$@"; rc=$?
