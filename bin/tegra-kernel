@@ -212,7 +212,17 @@ function build()
 	nice make -j $JOBS $ARGS oldconfig || return $?
 	nice make -j $JOBS $ARGS $MODULE 2>&1 | tee "$KBUILD_OUTPUT/build.log"
 
-	return ${PIPESTATUS[0]}
+	rc=${PIPESTATUS[0]}
+
+	if test "x$rc" = "x0"; then
+		status="Completed"
+	else
+		status="Failed"
+	fi
+
+	notify-send "tegra-kernel" "$status kernel build for $SOC"
+
+	return $rc
 }
 
 function clean()
