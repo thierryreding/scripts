@@ -335,10 +335,20 @@ function install()
 		# used and creates a local device named /dev/sde whose first
 		# partition is the root partition.
 		tegra210)
-			mount /dev/sdc1 /mnt &&
-				cp $KBUILD_OUTPUT/arch/$ARCH/boot/$DTS/$SOC-*.dtb /mnt/$SOC/boot &&
-				cp $KBUILD_OUTPUT/arch/$ARCH/boot/$IMAGE /mnt/$SOC/boot &&
-				umount /mnt
+#			mount /dev/sdc1 /mnt &&
+#				cp $KBUILD_OUTPUT/arch/$ARCH/boot/$DTS/$SOC-*.dtb /mnt/$SOC/boot &&
+#				cp $KBUILD_OUTPUT/arch/$ARCH/boot/$IMAGE /mnt/$SOC/boot &&
+#				umount /mnt
+#			# for L4T
+#			UMS=/dev/disk/by-path/pci-0000:00:1d.0-usb-0:1.5:1.0-scsi-0:0:0:0
+#			if test -b $UMS; then
+#				UMS=/dev/$(udevadm info --query name $UMS)
+#				mount ${UMS}1 /mnt &&
+#					nice make -j $JOBS INSTALL_MOD_PATH=/mnt modules_install &&
+#					cp $KBUILD_OUTPUT/arch/$ARCH/boot/$DTS/$SOC-*.dtb /mnt/boot/dtb &&
+#					cp $KBUILD_OUTPUT/arch/$ARCH/boot/$IMAGE /mnt/boot &&
+#					umount /mnt
+#			fi
 			;;
 	esac
 }
