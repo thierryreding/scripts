@@ -419,6 +419,34 @@ function flash()
 	esac
 }
 
+function distribute()
+{
+	if test -z "$SOC"; then
+		echo "SoC not specified"
+		exit 1
+	fi
+
+	release=$(make -s kernelrelease)
+	destdir=$(mktemp -d)
+	chmod og+rx "$destdir"
+	mkdir -p "$destdir"
+	mkdir -p "$destdir/boot"
+	mkdir -p "$destdir/boot/dtb"
+
+	cp $KBUILD_OUTPUT/arch/$ARCH/boot/$IMAGE "$destdir/boot"
+	cp $KBUILD_OUTPUT/arch/$ARCH/boot/dts/nvidia/$SOC-*.dtb "$destdir/boot/dtb"
+
+	nice make -j $JOBS INSTALL_MOD_PATH="$destdir" modules_install
+	rm "$destdir/lib/modules/$release/source"
+	rm "$destdir/lib/modules/$release/build"
+
+	echo -n "creating linux-$release.tar.gz..."
+	tar --owner root --group root -czf linux-$release.tar.gz -C "$destdir" .
+	echo "done"
+
+	rm -rf "$destdir"
+}
+
 function nvgpu()
 {
 	local ARGS
