@@ -86,6 +86,15 @@ if test -n "$FILTER"; then
 	FILTER="($FILTER)"
 fi
 
+echo -en "updating \033[35mboards.cfg\033[0m..."
+if tools/genboardscfg.py > /dev/null 2>&1; then
+	echo -e "\033[1;32mdone\033[0m"
+else
+	rc=$?
+	echo -e "\033[1;31mfailed ($rc)\033[0m"
+	exit $rc
+fi
+
 awk "/^#/ || /^$/ { next }; $FILTER { print \$2\" \"\$4\" \"\$5\" \"\$7 }" boards.cfg |
 	while read arch soc vendor board; do
 		KBUILD_OUTPUT="build/${soc}/${board}"
