@@ -169,9 +169,16 @@ function version()
 function build()
 {
 	local ARGS
+	local MODULE
 	check=no
 
 	while test $# -gt 0; do
+		if test -n "$prev"; then
+			eval "$prev=$1"
+			shift; prev=
+			continue
+		fi
+
 		case $1 in
 			-c | --check)
 				check=yes
@@ -180,6 +187,11 @@ function build()
 
 			-k | --keep-going)
 				ARGS="--keep-going"
+				shift
+				;;
+
+			-m | --module)
+				prev=MODULE
 				shift
 				;;
 
@@ -193,8 +205,12 @@ function build()
 		ARGS="$ARGS C=1"
 	fi
 
+	if test "x$MODULE" != "x"; then
+		MODULE="M=$MODULE"
+	fi
+
 	nice make -j $JOBS $ARGS oldconfig || return $?
-	nice make -j $JOBS $ARGS 2>&1 | tee "$KBUILD_OUTPUT/build.log"
+	nice make -j $JOBS $ARGS $MODULE 2>&1 | tee "$KBUILD_OUTPUT/build.log"
 
 	return ${PIPESTATUS[0]}
 }
@@ -206,6 +222,27 @@ function clean()
 
 function install()
 {
+	local MODULE
+
+	while test $# -gt 0; do
+		if test -n "$prev"; then
+			eval "$prev=$1"
+			shift; prev=
+			continue
+		fi
+
+		case $1 in
+			-m | --module)
+				prev=MODULE
+				shift
+				;;
+
+			*)
+				break
+				;;
+		esac
+	done
+
 	if test -z "$SOC"; then
 		echo "SoC not specified"
 		exit 1
@@ -216,7 +253,11 @@ function install()
 	cp $KBUILD_OUTPUT/arch/$ARCH/boot/$IMAGE /srv/nfs/$SOC/boot
 	cp $KBUILD_OUTPUT/arch/$ARCH/boot/$DTS/$SOC-*.dtb /srv/nfs/$SOC/boot
 
-	nice make -j $JOBS INSTALL_MOD_PATH=/srv/nfs/$SOC modules_install
+	if test "x$MODULE" != "x"; then
+		MODULE="M=$MODULE"
+	fi
+
+	nice make -j $JOBS $MODULE INSTALL_MOD_PATH=/srv/nfs/$SOC modules_install
 
 	case $SOC in
 		# Cardhu support exists for two different revisions, so create
