@@ -14,9 +14,12 @@ kconfig disable ARCH_MULTI_V7
 kconfig enable ARCH_MULTI_V5
 # for PWM_MXS
 kconfig enable ARCH_MXS
+# for PWM_LPC32XX
+kconfig enable ARCH_LPC32XX
 # PWM drivers
 kconfig enable PWM
 kconfig enable PWM_MXS
+kconfig enable PWM_LPC32XX
 # PWM users
 include users.include
 kconfig enable FB

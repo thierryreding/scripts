@@ -14,7 +14,8 @@ kconfig enable STAGING
 kconfig enable GREYBUS
 kconfig enable GREYBUS_BRIDGED_PHY
 # for PWM_CROS_EC
-kconfig enable MFD_CROS_EC
+kconfig enable CHROME_PLATFORMS
+kconfig enable CROS_EC
 # for PWM_HIBVT
 kconfig enable ARCH_HISI
 # for PWM_IQS620A
@@ -30,6 +31,7 @@ kconfig enable ARCH_ROCKCHIP
 # for PWM_SAMSUNG
 kconfig enable ARCH_EXYNOS
 # for PWM_SL28CPLD
+kconfig enable ARCH_LAYERSCAPE
 kconfig enable MFD_SL28CPLD
 # for PWM_SPRD
 kconfig enable ARCH_SPRD

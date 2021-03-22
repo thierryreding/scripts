@@ -37,7 +37,7 @@ kconfig enable ARCH_BCM_5301X
 # for PWM_BERLIN
 kconfig enable ARCH_BERLIN
 # for PWM_CROS_EC
-kconfig enable MFD_CROS_EC
+kconfig enable MFD_CROS_EC_DEV
 # for PWM_IQS620A
 kconfig enable MFD_IQS62X
 # for PWM_HIBVT

@@ -9,6 +9,9 @@ kconfig enable GPIOLIB
 kconfig enable I2C
 kconfig enable I2C_DESIGNWARE_PLATFORM
 kconfig enable INTEL_SOC_PMIC
+# for PWM_CROS_EC
+kconfig enable CHROME_PLATFORMS
+kconfig enable CROS_EC
 # for PWM_IQS620A
 kconfig enable MFD_IQS62X
 # for PWM_LPSS_PCI
@@ -20,6 +23,7 @@ kconfig enable PWM_INTEL_LGM
 # PWM drivers
 kconfig enable PWM
 kconfig enable PWM_CRC
+kconfig enable PWM_CROS_EC
 kconfig enable PWM_DWC
 kconfig enable PWM_IQS620A
 kconfig enable PWM_LPSS

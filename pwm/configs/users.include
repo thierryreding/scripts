@@ -1,6 +1,7 @@
 # PWM users
 kconfig enable INPUT
 kconfig enable INPUT_MISC
+kconfig enable INPUT_DA7280_HAPTICS
 kconfig enable MFD_MAX77693
 kconfig enable INPUT_MAX77693_HAPTIC
 kconfig enable MFD_MAX8997
