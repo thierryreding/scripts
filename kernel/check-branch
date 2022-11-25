@@ -1,0 +1,156 @@
+#!/usr/bin/python
+
+import binascii, crayons, git, re, subprocess, sys
+
+def head_type(head):
+    if head.object.type == 'commit':
+        return 'branch'
+
+    return head.object.type
+
+def check_trailers(repo, head, commit):
+    def identity(actor):
+        return '%s <%s>' % (actor.name, actor.email)
+
+    def sign_off(actor):
+        return 'Signed-off-by: %s <%s>' % (actor.name, actor.email)
+
+    success = True
+
+    with repo.config_reader() as config:
+        abbrev = config.get_value('core', 'abbrev', 12)
+
+    signoffs = {
+            'committer': {
+                'identity': identity(commit.committer),
+                'present': False,
+            },
+            'author': {
+                'identity': identity(commit.author),
+                'present': False,
+            },
+        }
+
+    # skip merge commits
+    if len(commit.parents) > 1:
+        return
+
+    committer = identity(commit.committer)
+    author = identity(commit.author)
+
+    proc = repo.git.execute(['git', 'interpret-trailers', '--parse'], as_process = True,
+                            istream = subprocess.PIPE)
+    stdout, _ = proc.communicate(str(commit.message).encode())
+
+    for trailer in stdout.decode().splitlines():
+        key, value = map(lambda x: x.strip(), trailer.split(':', 1))
+
+        if key == 'Signed-off-by':
+            if value == committer:
+                signoffs['committer']['present'] = True
+
+            if value == author:
+                signoffs['author']['present'] = True
+
+    hexsha = binascii.hexlify(commit.binsha).decode()[0:abbrev]
+
+    for key, value in signoffs.items():
+        if not value['present']:
+            print('%s: commit %s ("%s") in %s %s' % (crayons.red('ERROR', bold = True), hexsha,
+                                                     commit.summary, head_type(head), head))
+            print('%s  is missing a Signed-off-by: from its %s %s' % (' ' * 5, key,
+                                                                      value['identity']))
+            success = False
+
+    return success
+
+def check_references(repo, head, commit):
+    success = True
+
+    with repo.config_reader() as config:
+        abbrev = config.get_value('core', 'abbrev', 12)
+
+    proc = repo.git.execute(['git', 'interpret-trailers', '--parse'], as_process = True,
+                            istream = subprocess.PIPE)
+    stdout, _ = proc.communicate(str(commit.message).encode())
+    trailers = []
+
+    for trailer in stdout.decode().splitlines():
+        key, value = map(lambda x: x.strip(), trailer.split(':', 1))
+
+        if key == 'Fixes':
+            match = re.match('([0-9a-f]+) \("(.*)"\)', value)
+            ref, subject = match.group(1, 2)
+
+            if head.object.type == 'commit':
+                ancestors = repo.git.branch('--contains', ref)
+            else:
+                ancestors = repo.git.tag('--contains', ref)
+
+            for ancestor in ancestors.splitlines():
+                match = re.match('\*?\W*(.*)', ancestor)
+                if match.group(1) == head.name:
+                    break
+            else:
+                hexsha = binascii.hexlify(commit.binsha).decode()[0:abbrev]
+                print('%s: commit %s ("%s") referenced by' % (crayons.red('ERROR', bold = True),
+                                                              crayons.yellow(ref), subject))
+                print('%s  commit %s ("%s")' % (' ' * 5, crayons.yellow(hexsha), commit.summary))
+                print('%s  was not found in %s %s' % (' ' * 5, head_type(head),
+                                                      crayons.green(head)))
+                success = False
+
+    return success
+
+def check(repo, revisions):
+    if revisions:
+        parts = revisions.split('..')
+        if len(parts) > 1:
+            base, head = parts
+        else:
+            if len(parts) > 0:
+                head = parts[0]
+                base = None
+            else:
+                head = None
+                base = None
+    else:
+        base, head = None, None
+
+    if not head or head == 'HEAD':
+        head = repo.head.reference
+    else:
+        head = repo.refs[head]
+
+    if not base:
+        master = repo.remotes.origin.refs.master
+        base = repo.git.merge_base(head, master)
+        revisions = '%s..%s' % (base, head)
+
+    for branch in repo.branches:
+        if branch.commit == head.commit:
+            branch = branch.name
+            break
+    else:
+        branch = repo.git.describe(head)
+
+    #print('checking %s %s' % (head_type(head), head))
+
+    success = True
+
+    for commit in repo.iter_commits(revisions):
+        success &= check_trailers(repo, head, commit)
+        success &= check_references(repo, head, commit)
+
+    return success
+
+if __name__ == '__main__':
+    repo = git.Repo('.')
+
+    if len(sys.argv) > 1:
+        revisions = sys.argv[1]
+    else:
+        revisions = None
+
+    if not check(repo, revisions):
+        sys.exit(1)
