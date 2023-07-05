@@ -9,7 +9,7 @@ SELF=$0
 ARGS=$@
 CMD=build
 KBUILD_CHECKSRC=0
-KBUILD_ENABLE_EXTRA_GCC_CHECKS=
+KBUILD_EXTRA_WARN=
 MAKE_ARGS=
 NFSBOOT=no
 pwd=`pwd`
@@ -23,7 +23,12 @@ while test $# -gt 0; do
 
 	case $1 in
 		-c | --check)
-			KBUILD_CHECKSRC=1
+			if test "x$KBUILD_CHECKSRC" = "x1"; then
+				KBUILD_CHECKSRC=2
+			else
+				KBUILD_CHECKSRC=1
+			fi
+
 			shift
 			;;
 
@@ -43,7 +48,11 @@ while test $# -gt 0; do
 			;;
 
 		-p | --pedantic)
-			KBUILD_ENABLE_EXTRA_GCC_CHECKS=2
+			if test "x$KBUILD_EXTRA_WARN" = "x2"; then
+				KBUILD_EXTRA_WARN=3
+			else
+				KBUILD_EXTRA_WARN=2
+			fi
 			shift
 			;;
 
@@ -53,7 +62,7 @@ while test $# -gt 0; do
 			;;
 
 		-w | --warnings)
-			KBUILD_ENABLE_EXTRA_GCC_CHECKS=1
+			KBUILD_EXTRA_WARN=1
 			shift
 			;;
 
@@ -107,6 +116,7 @@ KBUILD_OUTPUT=${KBUILD_OUTPUT}/$SOC
 
 export PKG_CONFIG_LIBDIR
 export KBUILD_ENABLE_EXTRA_GCC_CHECKS
+export KBUILD_EXTRA_WARN
 export KBUILD_CHECKSRC
 export KBUILD_VERBOSE
 export KBUILD_OUTPUT
@@ -211,8 +221,15 @@ function build()
 
 	nice make -j $JOBS $ARGS oldconfig || return $?
 	nice make -j $JOBS $ARGS $MODULE 2>&1 | tee "$KBUILD_OUTPUT/build.log"
-
 	rc=${PIPESTATUS[0]}
+
+	# generate compile_commands.json for vim-lsp
+	if test -e compile_commands.json; then
+		rm compile_commands.json
+	fi
+
+	nice make -j $JOBS $ARGS compile_commands.json
+	ln -s $KBUILD_OUTPUT/compile_commands.json
 
 	if test "x$rc" = "x0"; then
 		status="Completed"
@@ -259,20 +276,56 @@ function dtbs()
 
 function check()
 {
+	local check_dt_bindings=no
+	local check_dtbs=no
+	local quiet=no
 	local ARGS
 
 	while test $# -gt 0; do
 		case $1 in
+			--dt-bindings)
+				check_dt_bindings=yes
+				shift
+				;;
+
+			--dtbs)
+				check_dtbs=yes
+				shift
+				;;
+
+			--quiet)
+				quiet=yes
+				shift
+				;;
+
 			*)
-				break
+				dt_schema_files="$1"
+				shift
 				;;
 		esac
 	done
 
-	ARGS="$ARGS dt_binding_check"
-	ARGS="$ARGS dtbs_check"
+	if test "x$check_dt_bindings" = "xyes"; then
+		ARGS="$ARGS DT_CHECKER_FLAGS='-m' dt_binding_check"
 
-	echo "ARGS: $ARGS"
+		if test "x$dt_schema_files" != "x"; then
+			ARGS="$ARGS DT_SCHEMA_FILES=$dt_schema_files"
+		fi
+	fi
+
+	if test "x$check_dtbs" = "xyes"; then
+		ARGS="$ARGS dtbs_check"
+
+		if test "x$dt_schema_files" != "x"; then
+			ARGS="$ARGS DT_SCHEMA_FILES=$dt_schema_files"
+		fi
+	fi
+
+	if test "x$quiet" = "xyes"; then
+		ARGS="$ARGS -s"
+	fi
+
+	echo nice make -j $JOBS $ARGS
 	nice make -j $JOBS $ARGS 2>&1 | tee "$KBUILD_OUTPUT/check.log"
 
 	rc=${PIPESTATUS[0]}
@@ -364,12 +417,12 @@ function flash()
 		tegra186)
 			pm342-recovery
 			KBUILD_OUTPUT=$(cd $KBUILD_OUTPUT; pwd)
-			L4T_ROOT=/home/thierry.reding/src/l4t/stage-main/out/l4t-t186ref-debug-aarch64/full_linux_for_tegra/Linux_for_Tegra
+			L4T_ROOT=/home/treding/src/l4t/stage-main/out/l4t-t186ref-debug-aarch64/full_linux_for_tegra/Linux_for_Tegra
 			oldpwd=$(pwd)
 			cd $L4T_ROOT
 			./flash.sh -k kernel \
 				-K $KBUILD_OUTPUT/arch/arm64/boot/Image \
-				-I /home/thierry.reding/src/pbs-ng.git/build/tegra186/initrd.gz \
+				-I /home/treding/src/pbs-ng.git/build/tegra186/initrd.gz \
 				-d $KBUILD_OUTPUT/arch/arm64/boot/dts/nvidia/tegra186-p2771-0000.dtb \
 				-N 192.168.69.100:/srv/nfs/tegra186 p2771-0000 eth0
 #				p2771-0000 mmcblk0p1
@@ -381,14 +434,14 @@ function flash()
 
 			if test "x$NFSBOOT" = "xyes"; then
 				extra_args="$extra_args -N 192.168.23.1:/srv/nfs/tegra194"
-				extra_args="$extra_args -I /home/thierry.reding/src/pbs-ng.git/build/tegra194/initrd.gz"
+				extra_args="$extra_args -I /home/treding/src/pbs-ng.git/build/tegra194/initrd.gz"
 				boot_device=eth0
 			else
 				boot_device=mmcblk0p1
 			fi
 
 			KBUILD_OUTPUT=$(cd $KBUILD_OUTPUT; pwd)
-			L4T_ROOT=$HOME/src/l4t/stage-main/out/l4t-t186ref-debug-aarch64/full_linux_for_tegra/Linux_for_Tegra
+			L4T_ROOT=/home/treding/src/l4t/stage-main/out/l4t-t186ref-debug-aarch64/full_linux_for_tegra/Linux_for_Tegra
 
 			if test -f "$L4T_ROOT/system.img"; then
 				extra_args="$extra_args -r"
@@ -432,13 +485,18 @@ function distribute()
 	mkdir -p "$destdir"
 	mkdir -p "$destdir/boot"
 	mkdir -p "$destdir/boot/dtb"
+	mkdir -p "$destdir/usr/lib/modules"
 
-	cp $KBUILD_OUTPUT/arch/$ARCH/boot/$IMAGE "$destdir/boot"
-	cp $KBUILD_OUTPUT/arch/$ARCH/boot/dts/nvidia/$SOC-*.dtb "$destdir/boot/dtb"
+	#cp $KBUILD_OUTPUT/arch/$ARCH/boot/$IMAGE "$destdir/boot"
+	#cp $KBUILD_OUTPUT/arch/$ARCH/boot/dts/nvidia/$SOC-*.dtb "$destdir/boot/dtb"
 
-	nice make -j $JOBS INSTALL_MOD_PATH="$destdir" modules_install
-	rm "$destdir/lib/modules/$release/source"
-	rm "$destdir/lib/modules/$release/build"
+	#nice make -j $JOBS INSTALL_MOD_PATH="$destdir" modules_install
+	#rm "$destdir/lib/modules/$release/source"
+	#rm "$destdir/lib/modules/$release/build"
+
+	cp -a /srv/nfs/$SOC/boot/$IMAGE "$destdir/boot/$IMAGE-upstream"
+	cp -a /srv/nfs/$SOC/boot/$SOC-*.dtb "$destdir/boot/dtb"
+	cp -a /srv/nfs/$SOC/usr/lib/modules/$release "$destdir/usr/lib/modules"
 
 	echo -n "creating linux-$release.tar.gz..."
 	tar --owner root --group root -czf linux-$release.tar.gz -C "$destdir" .
@@ -456,12 +514,48 @@ function nvgpu()
 		exit 1
 	fi
 
-	NVGPU="/home/thierry.reding/src/l4t/nvgpu.git"
+	#NVGPU="/home/treding/src/l4t/nvgpu.git"
+	NVGPU="/home/treding/src/l4t/stage-main/kernel/nvgpu"
+	ARGS="$ARGS NV_BUILD_KERNEL_OPTIONS=\"stable\""
+	ARGS="$ARGS CONFIG_TEGRA_HOST1X_NEXT=m"
 	ARGS="$ARGS M=$NVGPU/drivers/gpu/nvgpu"
+	ARGS="$ARGS srctree.host1x=$NVGPU"
 	ARGS="$ARGS srctree.nvgpu=$NVGPU"
 
 	if test "x$1" = "xbuild" -o "x$1" = "x"; then
 		nice make -j $JOBS $ARGS modules
+	fi
+
+	if test "x$1" = "xclean"; then
+		nice make -j $JOBS $ARGS clean
+	fi
+
+	if test "x$1" = "xinstall"; then
+		ARGS="$ARGS INSTALL_MOD_PATH=/srv/nfs/$SOC/usr"
+		nice make -j $JOBS $ARGS modules_install
+	fi
+}
+
+function nvmap()
+{
+	local ARGS
+
+	if test -z "$SOC"; then
+		echo "SoC not specified"
+		exit 1
+	fi
+
+	NVIDIA="/home/treding/src/l4t/stage-main/kernel/nvidia"
+	ARGS="$ARGS M=$NVIDIA/drivers/video/tegra/nvmap"
+	ARGS="$ARGS NV_BUILD_KERNEL_OPTIONS=stable"
+	ARGS="$ARGS srctree.nvidia=$NVIDIA"
+
+	if test "x$1" = "xbuild" -o "x$1" = "x"; then
+		nice make -j $JOBS $ARGS modules
+	fi
+
+	if test "x$1" = "xclean"; then
+		nice make -j $JOBS $ARGS clean
 	fi
 
 	if test "x$1" = "xinstall"; then
