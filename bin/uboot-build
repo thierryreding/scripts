@@ -87,7 +87,8 @@ if test -n "$FILTER"; then
 fi
 
 echo -en "updating \033[35mboards.cfg\033[0m..."
-if tools/genboardscfg.py > /dev/null 2>&1; then
+#if tools/genboardscfg.py > /dev/null 2>&1; then
+if tools/buildman/buildman -R > /dev/null 2>&1; then
 	echo -e "\033[1;32mdone\033[0m"
 else
 	rc=$?
