@@ -117,10 +117,19 @@ def check(repo, revisions):
     else:
         base, head = None, None
 
+    # can happen when we push tags, in which case we want to check up to the merge base
+    if base == head:
+        base = None
+
     if not head or head == 'HEAD':
         head = repo.head.reference
     else:
-        head = repo.refs[head]
+        if head.startswith('refs/heads/'):
+            head = repo.heads[head.removeprefix('refs/heads/')]
+        elif head.startswith('refs/tags/'):
+            head = repo.tags[head.removeprefix('refs/tags/')]
+        else:
+            head = repo.refs[head]
 
     if not base:
         master = repo.remotes.origin.refs.master
