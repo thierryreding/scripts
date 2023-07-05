@@ -12,6 +12,9 @@ kconfig enable NEW_LEDS
 kconfig enable LEDS_CLASS
 kconfig enable LEDS_LP8788
 kconfig enable LEDS_PWM
+kconfig enable LEDS_CLASS_MULTICOLOR
+kconfig enable LEDS_PWM_MULTICOLOR
+kconfig enable LEDS_QCOM_LPG
 kconfig enable REGULATOR
 kconfig enable REGULATOR_PWM
 kconfig enable REGULATOR_LP8788

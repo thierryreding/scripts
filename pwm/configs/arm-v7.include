@@ -8,6 +8,9 @@ kconfig enable MODULE_UNLOAD
 kconfig enable SYSFS
 # bus configuration
 kconfig enable I2C
+kconfig enable SPMI
+# subsystem configuration
+kconfig enable MAILBOX
 # architecture configuration
 kconfig disable ARM_SINGLE_ARMV7M
 kconfig enable ARCH_MULTIPLATFORM
@@ -50,8 +53,15 @@ kconfig enable MFD_LP3943
 kconfig enable ARCH_MESON
 # for PWM_MTK_DISP
 kconfig enable ARCH_MEDIATEK
+# for PWM_NTXEC
+kconfig enable MFD_NTXEC
+# for PWM_RASPBERRYPI_POE
+kconfig enable ARCH_BCM2835
+kconfig enable BCM2835_MBOX
+kconfig enable RASPBERRYPI_FIRMWARE
 # for PWM_RCAR
 kconfig enable ARCH_RENESAS
+kconfig enable SOC_RENESAS
 kconfig enable ARCH_R8A7778
 kconfig enable ARCH_R8A7779
 kconfig enable ARCH_R8A7790
@@ -72,6 +82,8 @@ kconfig enable ARCH_STI
 kconfig enable MFD_STMPE
 # for PWM_SUN4I
 kconfig enable ARCH_SUNXI
+# for PWM_SUNPLUS
+kconfig enable ARCH_SUNPLUS
 # for PWM_TEGRA
 kconfig enable ARCH_TEGRA
 # for PWM_TIECAP and PWM_TIEHRPWM
@@ -98,6 +110,7 @@ kconfig enable PWM_BCM_IPROC
 kconfig enable PWM_BCM_KONA
 kconfig enable PWM_BRCMSTB
 kconfig enable PWM_BERLIN
+kconfig enable PWM_CLK
 kconfig enable PWM_CROS_EC
 kconfig enable PWM_FSL_FTM
 kconfig enable PWM_HIBVT
@@ -109,7 +122,9 @@ kconfig enable PWM_LP3943
 kconfig enable PWM_MEDIATEK
 kconfig enable PWM_MESON
 kconfig enable PWM_MTK_DISP
+kconfig enable PWM_NTXEC
 kconfig enable PWM_PCA9685
+kconfig enable PWM_RASPBERRYPI_POE
 kconfig enable PWM_RCAR
 kconfig enable PWM_RENESAS_TPU
 kconfig enable PWM_ROCKCHIP
@@ -118,12 +133,14 @@ kconfig enable PWM_SPEAR
 kconfig enable PWM_STI
 kconfig enable PWM_STMPE
 kconfig enable PWM_SUN4I
+kconfig enable PWM_SUNPLUS
 kconfig enable PWM_TEGRA
 kconfig enable PWM_TIECAP
 kconfig enable PWM_TIEHRPWM
 kconfig enable PWM_TWL
 kconfig enable PWM_TWL_LED
 kconfig enable PWM_VT8500
+kconfig enable PWM_XILINX
 kconfig enable PWM_ZX
 # GPIO PWM drivers
 kconfig enable GPIO_MVEBU
@@ -133,6 +150,7 @@ kconfig enable COMMON_CLK_PWM
 kconfig enable DRM
 kconfig enable MFD_ATMEL_HLCDC
 kconfig enable DRM_ATMEL_HLCDC
+kconfig enable DRM_TI_SN65DSI86
 kconfig enable HWMON
 kconfig enable SENSORS_PWM_FAN
 kconfig enable GPIO_LP3943

@@ -4,6 +4,7 @@ kconfig allnoconfig
 kconfig enable DEBUG_FS
 kconfig enable SYSFS
 # for PWM_CRC
+kconfig enable COMMON_CLK
 kconfig enable GPIOLIB
 kconfig enable I2C
 kconfig enable I2C_DESIGNWARE_PLATFORM
@@ -31,3 +32,5 @@ include users.include
 kconfig enable DRM
 kconfig enable DRM_I915
 kconfig enable MFD_INTEL_SOC_PMIC
+kconfig enable DRM_SSD130X
+kconfig enable DRM_SSD130X_I2C

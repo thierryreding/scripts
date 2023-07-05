@@ -26,6 +26,7 @@ kconfig enable ARCH_OMAP2
 # PWM drivers
 kconfig enable PWM
 kconfig enable PWM_BCM2835
+kconfig enable PWM_CLK
 kconfig enable PWM_OMAP_DMTIMER
 # PWM users
 include users.include

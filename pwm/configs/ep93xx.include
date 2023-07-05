@@ -1,11 +1,15 @@
 kconfig architecture arm
 kconfig allnoconfig
 # basic configuration
+kconfig enable ATAGS
 kconfig enable DEBUG_FS
 kconfig enable MMU
 kconfig enable SYSFS
 # architecture configuration
 kconfig disable ARM_SINGLE_ARMV7M
+kconfig enable ARCH_MULTIPLATFORM
+kconfig disable ARCH_MULTI_V7
+kconfig enable ARCH_MULTI_V4T
 kconfig enable ARCH_EP93XX
 kconfig enable MACH_ADSSPHERE
 kconfig enable MACH_EDB9301

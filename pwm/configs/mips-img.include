@@ -2,6 +2,8 @@ include mips.include
 # for PWM_IMG
 kconfig disable MIPS_GENERIC_KERNEL
 kconfig enable MACH_PISTACHIO
+kconfig enable MFD
+kconfig enable MFD_SYSCON
 # PWM drivers
 kconfig enable PWM
 kconfig enable PWM_IMG

@@ -14,12 +14,25 @@ kconfig disable ARCH_MULTI_V7
 kconfig enable ARCH_MULTI_V5
 # for PWM_MXS
 kconfig enable ARCH_MXS
+# for PWM_PXA
+kconfig enable ARCH_PXA
+kconfig enable MACH_PXA27X_DT
+kconfig enable MACH_PXA3XX_DT
+# PXA legacy board files
+kconfig enable ATAGS
+kconfig enable ARCH_GUMSTIX
+kconfig enable PXA_SHARPSL
+kconfig enable MACH_AKITA
+kconfig enable MACH_SPITZ
+kconfig enable MACH_BORZOI
 # for PWM_LPC32XX
 kconfig enable ARCH_LPC32XX
 # PWM drivers
 kconfig enable PWM
-kconfig enable PWM_MXS
+kconfig enable PWM_CLK
 kconfig enable PWM_LPC32XX
+kconfig enable PWM_MXS
+kconfig enable PWM_PXA
 # PWM users
 include users.include
 kconfig enable FB

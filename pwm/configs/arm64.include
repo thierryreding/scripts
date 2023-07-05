@@ -13,6 +13,8 @@ kconfig enable I2C
 kconfig enable STAGING
 kconfig enable GREYBUS
 kconfig enable GREYBUS_BRIDGED_PHY
+# for PWM_APPLE
+kconfig enable ARCH_APPLE
 # for PWM_CROS_EC
 kconfig enable CHROME_PLATFORMS
 kconfig enable CROS_EC
@@ -28,6 +30,14 @@ kconfig enable ARCH_MESON
 kconfig enable ARCH_MEDIATEK
 # for PWM_ROCKCHIP
 kconfig enable ARCH_ROCKCHIP
+# for PWM_RZ_MTU3
+kconfig enable ARCH_RENESAS
+kconfig enable SOC_RENESAS
+kconfig enable ARCH_R9A07G043
+kconfig enable ARCH_R9A07G044
+kconfig enable ARCH_R9A07G054
+kconfig enable ARCH_R9A09G011
+kconfig enable RZ_MTU3
 # for PWM_SAMSUNG
 kconfig enable ARCH_EXYNOS
 # for PWM_SL28CPLD
@@ -45,8 +55,12 @@ kconfig enable ARCH_TEGRA
 kconfig enable TWL4030_CORE
 # for PWM_ZX
 kconfig enable ARCH_ZX
+# for PWM_VISCONTI
+kconfig enable ARCH_VISCONTI
 # PWM drivers
 kconfig enable PWM
+kconfig enable PWM_APPLE
+kconfig enable PWM_CLK
 kconfig enable PWM_CROS_EC
 kconfig enable PWM_HIBVT
 kconfig enable PWM_IQS620A
@@ -55,6 +69,7 @@ kconfig enable PWM_MESON
 kconfig enable PWM_MTK_DISP
 kconfig enable PWM_PCA9685
 kconfig enable PWM_ROCKCHIP
+kconfig enable PWM_RZ_MTU3
 kconfig enable PWM_SAMSUNG
 kconfig enable PWM_SL28CPLD
 kconfig enable PWM_SPRD
@@ -64,6 +79,8 @@ kconfig enable PWM_TEGRA
 kconfig enable PWM_TWL
 kconfig enable PWM_TWL_LED
 kconfig enable GREYBUS_PWM
+kconfig enable PWM_VISCONTI
+kconfig enable PWM_XILINX
 kconfig enable PWM_ZX
 # PWM users
 include users.include
@@ -71,6 +88,7 @@ kconfig enable COMMON_CLK_PWM
 kconfig enable DRM
 kconfig enable MFD_ATMEL_HLCDC
 kconfig enable DRM_ATMEL_HLCDC
+kconfig enable DRM_TI_SN65DSI86
 kconfig enable HWMON
 kconfig enable SENSORS_PWM_FAN
 kconfig enable GPIO_LP3943

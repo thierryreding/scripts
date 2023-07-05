@@ -6,8 +6,12 @@ kconfig enable MMU
 kconfig enable MODULES
 kconfig enable MODULE_UNLOAD
 kconfig enable SYSFS
+# machine configuration
+kconfig enable SOC_MICROCHIP_POLARFIRE
 # PWM drivers
 kconfig enable PWM
+kconfig enable PWM_CLK
+kconfig enable PWM_MICROCHIP_CORE
 kconfig enable PWM_SIFIVE
 # PWM users
 include users.include

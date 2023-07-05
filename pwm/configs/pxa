@@ -1,3 +1,0 @@
-include pxa.include
-kconfig olddefconfig
-kbuild
