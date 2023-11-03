@@ -1,0 +1,267 @@
+#!/usr/bin/env python3
+
+import cmd, os, re, shlex, subprocess, sys
+
+import click, crayons, git
+
+from devtools import debug
+
+def ellipsize(s, length):
+    if len(s) > length:
+        return s[0:length - 3] + '...'
+
+    return s
+
+def signoff(actor):
+    return re.compile(f'^Signed-off-by: {actor.name} <{actor.email}>$')
+
+HEX_NULL_SHA = '0' * 40
+
+identity = git.Actor.author()
+signedoffby = signoff(identity)
+
+bullet = click.style('*', fg = 'magenta')
+error = click.style('ERROR', fg = 'red')
+fail = click.style('failed', fg = 'red')
+okay = click.style('ok', fg = 'green')
+
+class GitHooksContext:
+    def __init__(self, root):
+        self.root = root
+
+        # read all of stdin so that it can be fed to each check
+        if not sys.stdin.isatty():
+            self.stdin = []
+
+            for line in sys.stdin:
+                self.stdin.append(line)
+        else:
+            self.stdin = sys.stdin
+
+def run_all_checks(context, *args):
+    parent = context.parent
+
+    for command in parent.command.commands:
+        # skip self
+        if command == context.command.name:
+            continue
+
+        cmd = parent.command.get_command(parent, command)
+        ctx = cmd.make_context(command, list(args), parent = parent)
+        result = cmd.invoke(ctx)
+
+@click.group()
+@click.pass_context
+def hooks(context):
+    context.obj = GitHooksContext(context)
+
+@hooks.command()
+@click.option('--file', '-f', type = click.File('r'), default = sys.stdin)
+@click.argument('args', nargs = -1)
+@click.pass_context
+def exec(context, file, args):
+    for line in file:
+        line = line.strip()
+
+        # skip empty lines and comments
+        if not line or line.startswith('#'):
+            continue
+
+        tokens = []
+
+        for token in shlex.split(line):
+            match = re.match('\$(.*)', token)
+            if match:
+                name = match.group(1)
+
+                try:
+                    num = int(name) - 1
+                    tokens.append(args[num])
+                except:
+                    click.echo(f'unknown variable ${name}')
+                    return
+            else:
+                tokens.append(token)
+
+        command = context.obj.root.command.get_command(context, tokens[0])
+        ctx = command.make_context(tokens[0], tokens[1:], parent = context)
+        result = command.invoke(ctx)
+
+@hooks.group()
+def commit_msg():
+    ...
+
+@commit_msg.command('all')
+@click.argument('filename', metavar = 'COMMIT_MSG')
+@click.pass_context
+def commit_msg_all(context, filename):
+    run_all_checks(context, filename)
+
+@commit_msg.command('signoff')
+@click.argument('filename', metavar = 'COMMIT_MSG')
+def commit_msg_sign_off(filename):
+    name = click.style('signed-off-by', fg = 'yellow')
+    click.echo(f'{bullet} checking {name}...', nl = False)
+
+    with open(filename, 'r') as message:
+        for line in message:
+            if signedoffby.match(line):
+                break
+        else:
+            click.echo(f'{fail} (missing Signed-off-by: from committer)')
+            sys.exit(1)
+
+    click.echo(f'{okay}')
+
+@hooks.group()
+def pre_push():
+    ...
+
+@pre_push.command('all')
+@click.argument('remote', metavar = 'REMOTE')
+@click.argument('url', metavar = 'URL')
+@click.pass_context
+def pre_push_all(context, remote, url):
+    run_all_checks(context, remote, url)
+
+@pre_push.command('signoff')
+@click.argument('remote', metavar = 'REMOTE')
+@click.argument('url', metavar = 'URL')
+@click.pass_context
+def pre_push_sign_off(context, remote, url):
+    tag = 'Signed-off-by:'
+
+    for lineno, line in enumerate(context.obj.stdin):
+        if lineno == 0:
+            name = click.style('signed-off-by', fg = 'yellow')
+            click.echo(f'{bullet} checking {name}...', nl = False)
+
+        local_ref, local_oid, remote_ref, remote_oid = line.split()
+
+        if local_oid == HEX_NULL_SHA:
+            debug('XXX deleting ...')
+        else:
+            if remote_oid != HEX_NULL_SHA:
+                # updating branch
+                revlist = f'{remote_oid}..{local_oid}'
+            else:
+                # creating branch
+                revlist = f'{local_oid}'
+
+            missing = { 'committer': [], 'author': [] }
+            repo = git.Repo()
+
+            # find missing signed-off-bys
+            for commit in repo.iter_commits(revlist):
+                committer = signoff(commit.committer)
+                author = signoff(commit.author)
+
+                proc = repo.git.execute(['git', 'interpret-trailers', '--parse'], as_process = True, istream = subprocess.PIPE)
+                stdout, _ = proc.communicate(str(commit.message).encode())
+                trailers = []
+
+                for trailer in stdout.decode().splitlines():
+                    trailers.append(trailer)
+
+                for trailer in trailers:
+                    if committer.match(trailer):
+                        break
+                else:
+                    missing['committer'].append(commit)
+
+                for trailer in trailers:
+                    if author.match(trailer):
+                        break
+                else:
+                    missing['author'].append(commit)
+
+            if len(missing['committer']) == 0 and len(missing['author']) == 0:
+                click.echo(f'{okay}')
+                return
+
+            click.echo(f'{fail}')
+
+            # output results
+            for index, role in enumerate(['committer', 'author']):
+                if index > 0:
+                    click.echo('|')
+
+                count = len(missing[role])
+
+                if count > 0:
+                    subject = 'commit' if count == 1 else 'commits'
+                    verb = 'is' if count == 1 else 'are'
+                    poss = 'its' if count == 1 else 'their'
+
+                    click.echo(f'| The following {subject}')
+                    click.echo(f'|')
+
+                    for commit in missing[role]:
+                        click.echo(f'|   {commit.hexsha} {commit.summary}')
+
+                    click.echo(f'|')
+                    click.echo(f'| {verb} missing a {tag} from {poss} {role}')
+
+            sys.exit(1)
+
+@pre_push.command('references')
+@click.argument('remote', metavar = 'REMOTE')
+@click.argument('url', metavar = 'URL')
+@click.pass_context
+def pre_push_references(context, remote, url):
+    for lineno, line in enumerate(context.obj.stdin):
+        if lineno == 0:
+            name = click.style('references', fg = 'yellow')
+            click.echo(f'{bullet} checking {name}...', nl = False)
+
+        local_ref, local_oid, remote_ref, remote_oid = line.split()
+
+        if local_oid == HEX_NULL_SHA:
+            debug('XXX deleting')
+        else:
+            if remote_oid != HEX_NULL_SHA:
+                # updating branch
+                revlist = f'{remote_oid}..{local_oid}'
+            else:
+                # creating branch
+                revlist = f'{local_oid}'
+
+        repo = git.Repo()
+        dangling = []
+
+        for commit in repo.iter_commits(revlist):
+            proc = repo.git.execute(['git', 'interpret-trailers', '--parse'],
+                                    as_process = True, istream = subprocess.PIPE)
+            stdout, _ = proc.communicate(str(commit.message).encode())
+
+            for trailer in stdout.decode().splitlines():
+                key, value = map(lambda x: x.strip(), trailer.split(':', 1))
+                #click.echo(f'key: {key} value: {value}')
+
+                if key == 'Fixes':
+                    match = re.match('([0-9a-f]+) \("(.*)"\)', value)
+                    ref, subject = match.group(1, 2)
+
+                    if not repo.is_ancestor(ref, commit):
+                        dangling.append((commit, ref, subject))
+
+        if not dangling:
+            click.echo(f'{okay}')
+            continue
+
+        click.echo(f'{fail}')
+
+        width = os.get_terminal_size().columns - 64
+
+        for commit, ref, subject in dangling:
+            hexsha = commit.hexsha[0:12]
+            summary = ellipsize(commit.summary, width)
+            subject = ellipsize(subject, width)
+
+            click.echo(f'| Commit {hexsha} ("{summary}") references unknown commit')
+            click.echo(f'|        {ref} ("{subject}")')
+
+        sys.exit(1)
+
+if __name__ == '__main__':
+    hooks()
