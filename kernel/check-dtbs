@@ -1,0 +1,78 @@
+#!/usr/bin/env python3
+
+import click, multiprocessing, os, pathlib, subprocess, sys
+
+CURDIR = pathlib.Path.cwd()
+HOME = pathlib.Path.home()
+
+cross = {}
+
+with open(HOME / '.cross-compile', 'r') as fobj:
+    for line in fobj:
+        if line.startswith('#'):
+            continue
+
+        key, value = line.strip().split(':', maxsplit = 1)
+
+        if key == 'path':
+            PATH = os.environ['PATH']
+
+            for path in value.strip().split(':'):
+                path = path.replace('$HOME', str(HOME))
+                PATH = f'{PATH}:{path}'
+
+            os.environ['PATH'] = PATH
+        else:
+            cross[key] = value.strip()
+
+@click.command()
+@click.option('--arch', '-A', required = True)
+@click.option('--force', '-F', is_flag = True)
+@click.option('--output', '-O', type = click.Path(), default = CURDIR / 'build' / 'dtbs')
+@click.option('--split', '-S', is_flag = True)
+@click.option('--vendor', '-V')
+@click.pass_context
+def cli(context, arch, force, output, split, vendor):
+    num_cpus = multiprocessing.cpu_count()
+    cross_compile = cross[arch]
+
+    if not (CURDIR / 'Makefile').exists() or not (CURDIR / 'Kconfig').exists():
+        print(f'{CURDIR} does not look like a Linux kernel source directory')
+        sys.exit(1)
+
+    top_dir = CURDIR / 'arch' / arch / 'boot' / 'dts'
+
+    if not vendor:
+        dirs = [ x for x in top_dir.iterdir() if x.is_dir() ]
+    else:
+        dirs = [ top_dir / vendor ]
+
+    if force:
+        for subdir in dirs:
+            for dts in subdir.glob('*.dts'):
+                dts.touch()
+
+    log_dir = output / 'logs' / arch
+    os.makedirs(log_dir, exist_ok = True)
+
+    for subdir in dirs:
+        os.makedirs(log_dir / subdir.name, exist_ok = True)
+
+        for dts in subdir.glob('*.dts'):
+            stem = os.path.join(subdir.name, dts.stem)
+            dtb = stem + '.dtb'
+
+            cmd  = [ 'make', f'ARCH={arch}', f'CROSS_COMPILE={cross_compile}' ]
+            cmd += [ f'O={output}', 'CHECK_DTBS=1', dtb ]
+
+            print(f'executing {cmd}')
+            proc = subprocess.run(cmd, capture_output = True)
+
+            with open(log_dir / (stem + '.out'), 'wb') as log:
+                log.write(proc.stdout)
+
+            with open(log_dir / (stem + '.err'), 'wb') as log:
+                log.write(proc.stderr)
+
+if __name__ == '__main__':
+    cli()
