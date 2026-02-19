@@ -124,14 +124,18 @@ def analyze(obj, directory):
                 print(f'  {path}: {node}')
 
 @cli.command()
+@click.argument('directory', type = click.Path(path_type = pathlib.Path), required = False)
 @click.pass_obj
-def todo(obj):
+def todo(obj, directory):
     for subdir in obj.dirs:
         for dts in sorted(subdir.glob('*.dts')):
             stem = os.path.join(subdir.name, dts.stem)
             total = []
 
-            with open(obj.log_dir / (stem + '.err'), 'r') as log:
+            if directory is None:
+                directory = obj.log_dir
+
+            with open(directory / (stem + '.err'), 'r') as log:
                 for line in log:
                     if not line or line[0].isspace():
                         continue
