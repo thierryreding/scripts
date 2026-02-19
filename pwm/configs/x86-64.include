@@ -4,6 +4,9 @@ kconfig allnoconfig
 kconfig enable 64BIT
 kconfig enable DEBUG_FS
 kconfig enable SYSFS
+# platforms
+kconfig enable X86_PLATFORM_DEVICES
+kconfig enable YOGABOOK
 # for PWM_CRC
 kconfig enable GPIOLIB
 kconfig enable I2C

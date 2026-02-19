@@ -41,6 +41,7 @@ kconfig enable RZ_MTU3
 # for PWM_SAMSUNG
 kconfig enable ARCH_EXYNOS
 # for PWM_SL28CPLD
+kconfig enable ARCH_NXP
 kconfig enable ARCH_LAYERSCAPE
 kconfig enable MFD_SL28CPLD
 # for PWM_SPRD

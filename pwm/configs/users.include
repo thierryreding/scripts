@@ -24,6 +24,7 @@ kconfig enable BACKLIGHT_LM3630A
 kconfig enable BACKLIGHT_LP855X
 kconfig enable MFD_LP8788
 kconfig enable BACKLIGHT_LP8788
+kconfig enable BACKLIGHT_MP3309C
 kconfig enable BACKLIGHT_PWM
 kconfig enable IIO
 kconfig enable LP8788_ADC

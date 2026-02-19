@@ -12,7 +12,7 @@ kconfig disable ARM_SINGLE_ARMV7M
 kconfig enable ARCH_MULTIPLATFORM
 kconfig enable ARCH_MULTI_V6
 # platform configuration
-kconfig enable ARCH_S3C64XX
+#kconfig enable ARCH_S3C64XX
 kconfig enable MACH_HMT
 kconfig enable MACH_SMARTQ5
 kconfig enable MACH_SMARTQ7

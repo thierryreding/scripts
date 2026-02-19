@@ -178,7 +178,7 @@ function kbuild()
 
 	args="$args O=$KBUILD_OUTPUT -j $JOBS"
 
-	make $args
+	make $args "$@"
 }
 
 if test -z "$configs"; then
@@ -204,6 +204,8 @@ function log_status()
 		fi
 	fi
 }
+
+configs="$configs"
 
 for config in $configs; do
 	# configuration files ending in .include are templates included in

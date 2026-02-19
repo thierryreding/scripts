@@ -50,7 +50,7 @@ while read branch; do
 done < "$topdir/branches"
 
 if test "x$opt_branches" = "xyes"; then
-	refspecs="${refspecs} for-next:for-next"
+	refspecs="${refspecs} fixes:fixes for-next:for-next"
 fi
 
 git push ${args} ${remote} ${refspecs}

@@ -3,6 +3,9 @@ kconfig allnoconfig
 # basic configuration
 kconfig enable DEBUG_FS
 kconfig enable SYSFS
+# platforms
+kconfig enable X86_PLATFORM_DEVICES
+kconfig enable YOGABOOK
 # for PWM_CRC
 kconfig enable COMMON_CLK
 kconfig enable GPIOLIB
